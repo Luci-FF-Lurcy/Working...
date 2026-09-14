@@ -1,2 +1,3 @@
 # Working...
-I was looking for a job and then I found a job And heaven knows I'm miserable now.
+I was looking for a job and then I found a job 
+And heaven knows I'm miserable now.
