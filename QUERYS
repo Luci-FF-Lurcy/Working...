@@ -1,0 +1,652 @@
+#QUERYS
+
+##QUERY INTENCIONES: 
+WITH INTENCIONES AS
+(
+    /*=========================================================================
+      INSTANTCALL
+    =========================================================================*/
+    SELECT
+        FECHA_ALTA,
+        ID_ORDEN_TRABAJO,
+        'INSTANTCALL' AS CANAL,
+        'INTENCION' AS TIPO_REGISTRO_INTENCION,
+        FECHA_CREACION,
+        ID_SERVICIO,
+        IDENTIFICACION,
+        FAMILIA_FINAL,
+        TECNOLOGIA_FINAL,
+        CATEGORIZACION_OPERACIONAL_N1,
+        CATEGORIZACION_OPERACIONAL_N2,
+        CATEGORIZACION_OPERACIONAL_N3,
+        REGION,
+        CATEGORIA_RESOLUCION_NIVEL_1,
+        CATEGORIA_RESOLUCION_NIVEL_2F,
+        CATEGORIA_RESOLUCION_NIVEL_3,
+        FECHA_IMPACTO,
+        NULL AS NFILAF,
+        NULL AS RNR,
+        NULL AS GRUPO_SOPORTE_ASIGNADOF
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INSTANTCALL
+    WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO'
+
+
+    UNION ALL
+
+
+    /*=========================================================================
+      KIOSKO
+    =========================================================================*/
+    SELECT
+        FECHA_ALTA,
+        ID_ORDEN_TRABAJO,
+        'KIOSKO' AS CANAL,
+        'INTENCION' AS TIPO_REGISTRO_INTENCION,
+        FECHA_INGRESO AS FECHA_CREACION,
+        SUBSCRIBER_ID AS ID_SERVICIO,
+        IDENTIFICACION_CLIENTE AS IDENTIFICACION,
+        SUBPRODUCTO_HOMOLOGADO_FINAL AS FAMILIA_FINAL,
+        TECNOLOGIA_FINAL1 AS TECNOLOGIA_FINAL,
+        CATEGORIZACION_OPERACIONAL_N1,
+        CATEGORIZACION_OPERACIONAL_N2,
+        CATEGORIZACION_OPERACIONAL_N3,
+        REGION,
+        CATEGORIA_RESOLUCION_NIVEL_1,
+        TIPOLOGIA_GESTION AS CATEGORIA_RESOLUCION_NIVEL_2F,
+        CATEGORIA_RESOLUCION_NIVEL_3,
+        FECHA_IMPACTO,
+        NFILAF,
+        NULL AS RNR,
+        NULL AS GRUPO_SOPORTE_ASIGNADOF
+
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+    WHERE NFILAF = 1
+
+
+    UNION ALL
+
+
+    /*=========================================================================
+      INBOUND
+    =========================================================================*/
+    SELECT
+        FECHA_ALTA,
+        ID_ORDEN_TRABAJO,
+        'INBOUND' AS CANAL,
+        'INTENCION' AS TIPO_REGISTRO_INTENCION,
+        FECHA_CREACION,
+        ID_SERVICIO,
+        IDENTIFICACION,
+        FAMILIA_FINAL,
+        TECNOLOGIA_FINAL,
+        CATEGORIZACION_OPERACIONAL_N1,
+        CATEGORIZACION_OPERACIONAL_N2,
+        CATEGORIZACION_OPERACIONAL_N3,
+        REGION,
+        CATEGORIA_RESOLUCION_NIVEL_1,
+        CATEGORIA_RESOLUCION_NIVEL_2_F
+            AS CATEGORIA_RESOLUCION_NIVEL_2F,
+        CATEGORIA_RESOLUCION_NIVEL_3,
+        FECHA_IMPACTO,
+        NFILAF,
+
+        CASE
+            WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN
+                 (
+                     'RRSS',
+                     'CONTACT CENTER'
+                 )
+             AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) NOT IN
+                 (
+                     'RECHAZADO'
+                 )
+                THEN 1
+
+            WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN
+                 (
+                     'RETENCIÓN Y RECUPERACIÓN'
+                 )
+             AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) IN
+                 (
+                     'NO RETENIDO',
+                     'RETENIDO'
+                 )
+                THEN 1
+        END AS RNR,
+
+        GRUPO_SOPORTE_ASIGNADOF
+
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
+
+    WHERE RNR = 1
+    AND NFILAF = 1
+
+
+    UNION ALL
+
+
+    /*=========================================================================
+      BARRA
+    =========================================================================*/
+    SELECT
+        FECHA_ALTA,
+        NULL AS ID_ORDEN_TRABAJO,
+        'BARRA' AS CANAL,
+        'INTENCION' AS TIPO_REGISTRO_INTENCION,
+        FECHA AS FECHA_CREACION,
+        SUBSCRIBER_FINAL AS ID_SERVICIO,
+        IDENTIFICACION,
+        SUBPRODUCTO_HOMOLOGADO_FF AS FAMILIA_FINAL,
+        TECNOLOGIA_FINAL_F AS TECNOLOGIA_FINAL,
+        SUB_CATEGORIA_VALIDA AS CATEGORIZACION_OPERACIONAL_N1,
+        NULL AS CATEGORIZACION_OPERACIONAL_N2,
+        NULL AS CATEGORIZACION_OPERACIONAL_N3,
+        REGION,
+        NULL AS CATEGORIA_RESOLUCION_NIVEL_1,
+        NULL AS CATEGORIA_RESOLUCION_NIVEL_2F,
+        NULL AS CATEGORIA_RESOLUCION_NIVEL_3,
+        TO_DATE(MES_IMPACTO, 'YYYYMM') AS FECHA_IMPACTO,
+        NFILAFF AS NFILAF,
+        RNR,
+        NULL AS GRUPO_SOPORTE_ASIGNADOF
+
+    FROM SANDBOX.SAC_RET.FIJO_INTENCION_BARRA
+
+    WHERE RNR = 1
+    AND TECNOLOGIA_FINAL_F IN ('HFC', 'GPON')
+    AND NFILAFF = 1
+),
+H_FINAL AS
+(
+    SELECT
+        T.*,
+
+        ROW_NUMBER() OVER
+        (
+            ORDER BY
+                FECHA_IMPACTO,
+                FECHA_CREACION,
+                ID_SERVICIO,
+                CANAL
+        ) AS ID_UNICO,
+
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY ID_SERVICIO
+
+            ORDER BY
+                FECHA_IMPACTO,
+                FECHA_CREACION,
+                CANAL
+        ) AS RN_INTENCION_SERVICIO
+
+   
+
+    FROM INTENCIONES T
+
+    WHERE T.FECHA_CREACION >= DATE '2025-10-01'
+
+      /* Equivalente a DATE(FECHA_CREACION) <= CURRENT_DATE */
+     -- AND T.FECHA_CREACION < CURRENT_DATE + 1
+),
+
+H_REPORTE AS
+(
+    SELECT
+        *
+    FROM H_FINAL
+
+    WHERE FECHA_IMPACTO >= DATE '2026-01-01'
+     -- AND FECHA_IMPACTO < CURRENT_DATE + 1
+),
+
+INCIDENCIAS AS
+(
+    SELECT
+        'INCIDENCIA' AS TIPO_REGISTRO_INCIDENCIA,
+
+        NRO_ORDEN_DE_TRABAJO,
+
+        CASE
+            WHEN NRO_ORDEN_DE_TRABAJO IS NOT NULL
+                THEN 'Mantenimiento'
+
+            ELSE 'Reclamos'
+        END AS TIPO_INCIDENCIAS,
+
+        CASE
+            WHEN TECNOLOGIA_SERV IN
+                 (
+                     'V.GPON',
+                     'GPON',
+                     '.GPON'
+                 )
+                THEN 'GPON'
+
+            WHEN TECNOLOGIA_SERV IN
+                 (
+                     'HFC',
+                     'FC'
+                 )
+                THEN 'HFC'
+
+            ELSE TECNOLOGIA_SERV
+        END AS TECNOLOGIA_HOMOLOGADA,
+
+        SERVICIO_SERV,
+        FECHA_INGRESO AS FI,
+        CATEGORIZACION_TIER_1,
+        CATEGORIZACION_TIER_2,
+        CATEGORIZACION_TIER_3
+
+    FROM OID_DB.OID_DB.OID_REMEDY_INCIDENTES_SAC
+    WHERE FECHA_INGRESO >= DATE '2025-07-01'
+    AND TECNOLOGIA_SERV IN
+          (
+              'V.GPON',
+              'GPON',
+              '.GPON',
+              'HFC',
+              'FC'
+          )
+   AND CATEGORIZACION_TIER_1 IN
+          (
+              'Novedad Soporte Técnico',
+              'Novedad Técnica',
+              'Novedades Técnicas',
+              'Soporte Técnico'
+          )
+),
+
+INCIDENCIAS_POR_INTENCION AS
+(
+    SELECT
+        H.ID_UNICO,
+        H.ID_SERVICIO,
+
+        I.TIPO_REGISTRO_INCIDENCIA,
+        I.NRO_ORDEN_DE_TRABAJO AS NRO_ORDEN_INCIDENCIA,
+        I.TIPO_INCIDENCIAS,
+        I.FI,
+        I.TECNOLOGIA_HOMOLOGADA,
+        I.CATEGORIZACION_TIER_1,
+        I.CATEGORIZACION_TIER_2,
+        I.CATEGORIZACION_TIER_3,
+
+        CASE
+            WHEN I.FI IS NOT NULL
+                THEN ROW_NUMBER() OVER
+                     (
+                         PARTITION BY H.ID_UNICO
+
+                         ORDER BY
+                             I.FI DESC,
+                             I.NRO_ORDEN_DE_TRABAJO DESC,
+                             I.CATEGORIZACION_TIER_1,
+                             I.CATEGORIZACION_TIER_2,
+                             I.CATEGORIZACION_TIER_3
+                     )
+        END AS RN_INCIDENCIA
+
+
+    FROM H_FINAL H
+
+    LEFT JOIN INCIDENCIAS I
+
+        ON H.ID_SERVICIO = I.SERVICIO_SERV
+
+       /*---------------------------------------------------------
+         MISMA LOGICA DEL YYYYMM ORIGINAL.
+
+         Antes:
+
+         TO_CHAR(I.FI,'YYYYMM')
+             BETWEEN
+         TO_CHAR(ADD_MONTHS(H.FECHA_CREACION,-3),'YYYYMM')
+             AND
+         TO_CHAR(H.FECHA_CREACION,'YYYYMM')
+
+         Ahora se compara directamente por fecha.
+       ---------------------------------------------------------*/
+AND TO_CHAR(I.FI, 'YYYYMM') BETWEEN TO_CHAR(ADD_MONTHS(H.FECHA_CREACION, -3), 'YYYYMM')  AND TO_CHAR(H.FECHA_CREACION, 'YYYYMM')
+
+      -- AND I.FI >=
+      --     DATE_TRUNC
+      --     (
+      --         'month',
+      --         ADD_MONTHS(H.FECHA_CREACION, -3)
+      --     )
+
+    --AND I.FI < DATE(H.FECHA_CREACION) + 1
+           
+),
+BASE_FALLAS AS
+(
+    SELECT
+        H.*,
+        I.TIPO_REGISTRO_INCIDENCIA,
+        I.NRO_ORDEN_INCIDENCIA,
+        I.TIPO_INCIDENCIAS,
+        I.FI,
+        I.TECNOLOGIA_HOMOLOGADA,
+        I.CATEGORIZACION_TIER_1,
+        I.CATEGORIZACION_TIER_2,
+        I.CATEGORIZACION_TIER_3,
+        I.RN_INCIDENCIA
+    FROM H_REPORTE H
+
+    LEFT JOIN INCIDENCIAS_POR_INTENCION I
+        ON H.ID_UNICO = I.ID_UNICO
+),
+INTENCIONES_VALIDAS AS
+(
+    SELECT DISTINCT
+        ID_UNICO
+
+    FROM INCIDENCIAS_POR_INTENCION
+
+    WHERE TIPO_INCIDENCIAS IN
+          (
+              'Reclamos',
+              'Mantenimiento'
+          )
+     AND CATEGORIZACION_TIER_1 IN 
+          (
+                'Novedad Soporte Técnico',
+'Novedad Técnica',
+'Novedades Técnicas',
+'Soporte Técnico'
+
+          ) 
+
+),
+EVENTOS_VALIDOS AS
+(
+    SELECT
+        H.ID_UNICO,
+        H.ID_SERVICIO,
+        H.FECHA_IMPACTO,
+        H.FECHA_CREACION
+
+    FROM H_FINAL H
+
+    INNER JOIN INTENCIONES_VALIDAS V
+        ON H.ID_UNICO = V.ID_UNICO
+),
+SECUENCIA_IMPACTO AS
+(
+    SELECT
+        ID_UNICO,
+        ID_SERVICIO,
+        FECHA_IMPACTO,
+
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY
+                ID_SERVICIO,
+                FECHA_IMPACTO
+
+            ORDER BY
+                FECHA_CREACION,
+                ID_UNICO
+        ) - 1 AS SECUENCIA_IMPACTO
+
+    FROM EVENTOS_VALIDOS
+),
+IMPACTOS_UNICOS AS
+(
+    SELECT DISTINCT
+        ID_SERVICIO,
+        FECHA_IMPACTO
+
+    FROM EVENTOS_VALIDOS
+),
+EVENTOS_VALIDOS_REPORTE AS
+(
+    SELECT
+        E.ID_UNICO,
+        E.ID_SERVICIO,
+        E.FECHA_IMPACTO,
+        E.FECHA_CREACION
+
+    FROM EVENTOS_VALIDOS E
+
+    INNER JOIN H_REPORTE H
+        ON E.ID_UNICO = H.ID_UNICO
+),
+IMPACTOS_HISTORICOS AS
+(
+    SELECT
+        A.ID_UNICO,
+
+        COUNT(B.FECHA_IMPACTO)
+            AS IMPACTOS_90D
+
+    FROM EVENTOS_VALIDOS_REPORTE A
+
+    LEFT JOIN IMPACTOS_UNICOS B
+
+        ON A.ID_SERVICIO = B.ID_SERVICIO
+
+       AND DATE(B.FECHA_IMPACTO)
+           BETWEEN DATE(A.FECHA_IMPACTO) - 90
+               AND DATE(A.FECHA_IMPACTO) - 1
+
+    GROUP BY
+        A.ID_UNICO
+),
+REINCIDENCIA90 AS
+(
+    SELECT
+        E.ID_UNICO,
+        E.ID_SERVICIO,
+        E.FECHA_IMPACTO,
+
+        COALESCE(H.IMPACTOS_90D, 0)
+        +
+        COALESCE(S.SECUENCIA_IMPACTO, 0)
+            AS REINCIDENCIAS_INTENCION_90D
+
+    FROM EVENTOS_VALIDOS_REPORTE E
+
+    LEFT JOIN IMPACTOS_HISTORICOS H
+        ON E.ID_UNICO = H.ID_UNICO
+
+    LEFT JOIN SECUENCIA_IMPACTO S
+        ON E.ID_UNICO = S.ID_UNICO
+),
+
+EVENTOS_INCIDENCIAS_VALIDOS AS
+(
+    SELECT
+        I.ID_UNICO,
+        I.ID_SERVICIO,
+        I.RN_INCIDENCIA,
+        I.FI,
+        I.TIPO_INCIDENCIAS,
+      I.CATEGORIZACION_TIER_1
+
+    FROM INCIDENCIAS_POR_INTENCION I
+
+    INNER JOIN H_REPORTE H
+        ON I.ID_UNICO = H.ID_UNICO
+
+    WHERE I.TIPO_INCIDENCIAS IN
+          (
+              'Reclamos',
+              'Mantenimiento'
+          )
+       AND I.CATEGORIZACION_TIER_1 IN 
+          (
+                'Novedad Soporte Técnico',
+'Novedad Técnica',
+'Novedades Técnicas',
+'Soporte Técnico'
+
+          )
+
+      AND I.FI IS NOT NULL
+),
+SECUENCIA_INCIDENCIA_DIA AS
+(
+    SELECT
+        ID_UNICO,
+        ID_SERVICIO,
+        RN_INCIDENCIA,
+        FI,
+
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY
+                ID_UNICO,
+                DATE(FI)
+
+            ORDER BY
+                FI,
+                RN_INCIDENCIA
+        ) - 1 AS SECUENCIA_INCIDENCIA_DIA
+
+    FROM EVENTOS_INCIDENCIAS_VALIDOS
+),
+IMPACTOS_INCIDENCIAS_UNICOS AS
+(
+    SELECT DISTINCT
+        ID_UNICO,
+        ID_SERVICIO,
+        DATE(FI) AS FECHA_INCIDENCIA
+
+    FROM EVENTOS_INCIDENCIAS_VALIDOS
+),
+IMPACTOS_INCIDENCIAS_HISTORICOS AS
+(
+    SELECT
+        A.ID_UNICO,
+        A.RN_INCIDENCIA,
+
+        COUNT(B.FECHA_INCIDENCIA)
+            AS IMPACTOS_INCIDENCIAS_90D
+
+    FROM EVENTOS_INCIDENCIAS_VALIDOS A
+
+    LEFT JOIN IMPACTOS_INCIDENCIAS_UNICOS B
+
+        ON A.ID_UNICO = B.ID_UNICO
+
+       AND B.FECHA_INCIDENCIA
+           BETWEEN DATE(A.FI) - 90
+               AND DATE(A.FI) - 1
+
+    GROUP BY
+        A.ID_UNICO,
+        A.RN_INCIDENCIA
+),
+REINCIDENCIA_INCIDENTES_90D AS
+(
+    SELECT
+        E.ID_UNICO,
+        E.ID_SERVICIO,
+        E.RN_INCIDENCIA,
+        E.FI,
+
+        COALESCE
+        (
+            H.IMPACTOS_INCIDENCIAS_90D,
+            0
+        )
+        +
+        COALESCE
+        (
+            S.SECUENCIA_INCIDENCIA_DIA,
+            0
+        )
+        AS REINCIDENCIAS_INCIDENTES_90D
+
+    FROM EVENTOS_INCIDENCIAS_VALIDOS E
+
+    LEFT JOIN IMPACTOS_INCIDENCIAS_HISTORICOS H
+
+        ON E.ID_UNICO = H.ID_UNICO
+       AND E.RN_INCIDENCIA = H.RN_INCIDENCIA
+
+    LEFT JOIN SECUENCIA_INCIDENCIA_DIA S
+
+        ON E.ID_UNICO = S.ID_UNICO
+       AND E.RN_INCIDENCIA = S.RN_INCIDENCIA
+),
+RESULTADO_FINAL AS
+(
+    SELECT
+        B.*,
+
+        /*---------------------------------------------------------------------
+          REINCIDENCIA INTENCION
+        ---------------------------------------------------------------------*/
+        COALESCE
+        (
+            R.REINCIDENCIAS_INTENCION_90D,
+            0
+        ) AS REINCIDENCIAS_INTENCION_90D,
+
+        CASE
+            WHEN COALESCE(R.REINCIDENCIAS_INTENCION_90D, 0) = 0
+                THEN '0. PRIMERA INTENCION'
+
+            WHEN R.REINCIDENCIAS_INTENCION_90D = 1
+                THEN '1. REINCIDENTE INTENCION 1'
+
+            WHEN R.REINCIDENCIAS_INTENCION_90D = 2
+                THEN '2. REINCIDENTE INTENCION 2'
+
+            WHEN R.REINCIDENCIAS_INTENCION_90D = 3
+                THEN '3. REINCIDENTE INTENCION 3'
+
+            ELSE '4. REINCIDENTE INTENCION 4+'
+
+        END AS CATEGORIA_REINCIDENCIA_INTENCION_90D,
+
+        /*---------------------------------------------------------------------
+          REINCIDENCIA INCIDENCIA
+        ---------------------------------------------------------------------*/
+        COALESCE
+        (
+            RI.REINCIDENCIAS_INCIDENTES_90D,
+            0
+        ) AS REINCIDENCIAS_INCIDENTES_90D,
+
+        CASE
+            WHEN COALESCE
+                 (
+                     RI.REINCIDENCIAS_INCIDENTES_90D,
+                     0
+                 ) = 0
+                THEN '0. PRIMERA INCIDENCIA'
+
+            WHEN RI.REINCIDENCIAS_INCIDENTES_90D = 1
+                THEN '1. REINCIDENTE INCIDENCIA 1'
+
+            WHEN RI.REINCIDENCIAS_INCIDENTES_90D = 2
+                THEN '2. REINCIDENTE INCIDENCIA 2'
+
+            WHEN RI.REINCIDENCIAS_INCIDENTES_90D = 3
+                THEN '3. REINCIDENTE INCIDENCIA 3'
+
+            ELSE '4. REINCIDENTE INCIDENCIA 4+'
+
+        END AS CATEGORIA_REINCIDENCIA_INCIDENTES_90D
+
+    FROM BASE_FALLAS B
+
+    LEFT JOIN REINCIDENCIA90 R
+        ON B.ID_UNICO = R.ID_UNICO
+
+    LEFT JOIN REINCIDENCIA_INCIDENTES_90D RI
+        ON B.ID_UNICO = RI.ID_UNICO
+       AND B.RN_INCIDENCIA = RI.RN_INCIDENCIA
+)
+
+
+SELECT * 
+FROM RESULTADO_FINAL
+WHERE TIPO_REGISTRO_INCIDENCIA = 'INCIDENCIA'
+
+ 
