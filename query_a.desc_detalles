@@ -1,0 +1,57 @@
+NOTAS:
+CANALES DISPONIBLES: Inbound, Kiosko, Barra.
+TECNOLOGÍA: GPON, HFC
+FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
+
+- La tabla inventario será la tabla Dimensiones
+
+¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
+Existe una tabla de intenciones por canal las columnas que especifican el resultado de la gestións son:
+Inbound:
+  - CATEGORIZACIÓN_OPERACIONAL_N2: Intención de renuncia - Inbound, Intencion de Retiro, Intención de retiro, Traslado no Factible, Intención de renuncia - Traslados, Intención de renuncia - CAC, Intención de renuncia - Kioscos, Intención de renuncia - Redes Sociales.
+  - CATEGORIA_RESOLUCION_NIVEL_2_F: RECHAZADO, NO RETENIDO, RETENIDO, NO GESTIONADO, NO CONTACTADO, SE ACTUALIZA, PROCEDE, PROCEDE, TRASLADO DENTRO DE COBERTURA
+  - FECHA_CREACION: fecha en que ingresó la intención
+  - CLAVE PRIMARIA CON INVENTARIO: (posiblemente IDENTIFICACION)
+
+Kiosko:
+  - CATEGORIZACION_OPERACIONAL_N2: Intención de renuncia - Kiosko
+  - TIPOLOGIA_GESTION: RETENIDO, NO RETENIDO, NO RETENIDO - TRASLADO FUERA DE COBERTURA
+  - FECHA_INGRESO: Fecha en que ingresó la intención
+  - CLAVE PRIMARIA con INVENTARIO: SUBSCRIBER_ID
+
+Barra: PENDIENTE
+
+¿Qué representa “Retenidos Total”? Si el mismo ID_SERVICIO fue retenido dos veces durante septiembre, ¿cuenta como 2 retenciones o como 1 cliente retenido? Esta decisión cambia completamente el KPI.
+
+
+¿Cómo identificamos que la retención tuvo descuento? El query actual busca una oferta suplementaria utilizando ID_SERVICIO = SUBSCRIBER_ID, dentro del mismo mes y activada después de la gestión.   Query tablero Necesitamos decidir si esa regla es válida para nuestro tablero.
+La tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO es una fotografía diaria del inventario de servicios FIJOS, es decir, si un cliente tiene activado una oferta suplementaria durante 1 mes, aparecerá en la tabla inventario 30 veces. 
+- los descuentos aplicados por retención son conocidos como ofertas suplementarias y se diferencian del resto de servicios activos por SUBSCRIBER_ID mediante la columna TIPO_SERVICIO = 'SUPLEMENTARIO'
+- TIPO_SERVICIO = 'PRIMARIA'; indica el servicio contratado de forma inicial del cliente, es decir, el primer servicio que contrató, lo suplementario es las promociones, descuentos, etc aplicados a ese servicio.
+- DESCRIPCION_PLAN indica el tipo de servicio, ejemplo si TIPO_SERVICIO = 'SUPLEMENTARIO', DESCRIPCION_PLAN = 'DESCUENTO RETENCION 50% POR 6 MESES TV' (si DESCRIPCION_PLAN LIKE '%RETENCION%', columna BUSSINESS_CATEGORY = 'DESCUENTO' no confirmado, hacer join con base intenciones para comprobar)
+- FECHA_ACTIVACION_SUP indica la fecha ('2026-10-01 01:01:01') en que sea activó la oferta suplementaria (el descuento mediante retención)
+- FECHA_VENCIMIENTO_SUP indica la fecha en que vencerá el descuento aplicado en FECHA_ACTIVACION_SUP ambas columnas poseeran datos si existe un desc activo, sino será NULL
+  
+
+¿Qué ID_DETALLE_PLAN representan descuentos? Ya existe una lista en el query actual y algunos IDs están homologados a herramientas como 50% dcto 3 meses, 25% dcto 12 meses, etc.   Query tablero Necesitamos validar si esa lista está completa.
+Cada DESCRIPCION_PLAN tiene un ID_DETALLE PLAN (hacer join para mostrar todos los DESPCRIPCION_PLAN asociados a unos ID_DETALLE_PLAN)
+
+¿De dónde obtenemos el precio del servicio? Necesitamos encontrar en OID_INVENTARIO_FIJO o en otra tabla el valor que permita calcular económicamente el descuento.
+En OID_DB.OID_DB.OID_INVENTARIO_FIJO
+  - TARIFA_BASICA_BI indica el valor del servicio PRIMARIA contratado. (AVECES NULL INVESTIGAR)
+  - 
+
+¿Cómo quieres valorar el descuento? Necesito saber si quieres el descuento mensual o el compromiso completo. Por ejemplo, 25% de $40 durante 6 meses podría ser $10 o $60, dependiendo de la definición.
+Evaluaremos las alternativas:
+PENDIENTE
+
+¿Qué fecha manda en el tablero? Mi recomendación inicial sería utilizar FECHA_GESTION/FECHA_CREACION para ubicar la retención en el mes, no FECHA_ACTIVACION_SUP. Pero tenemos que confirmarlo.
+FECHA_ACTIVACION_SUP indica la fecha en que se activó la oferta suplementaria (descuento), Esta debe coincidir con la FECHA_INGRESO 
+
+¿Qué debe ocurrir si una intención es el 30 de septiembre y el descuento se activa el 1 de octubre? El query actual la perdería porque exige que oferta e intención estén en el mismo YYYYMM.   Query tablero Para retención real, posiblemente deberíamos utilizar una ventana de días y no “mismo mes”.
+PENDIENTE:
+
+¿Cómo vamos a utilizar FECHA_PROCESO de OID_INVENTARIO_FIJO? Como ya determinaste, esa tabla es una fotografía diaria. Es fundamental decidir qué fotografía representa correctamente el estado que queremos analizar y, al mismo tiempo, evitar recorrer innecesariamente millones de registros.
+
+
+  
