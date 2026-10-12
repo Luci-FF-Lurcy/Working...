@@ -7,29 +7,31 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
 Existe una tabla de intenciones por canal las columnas que especifican el resultado de la gestións son:
-Inbound:
+INBOUND:
   - CATEGORIZACIÓN_OPERACIONAL_N2: Intención de renuncia - Inbound, Intencion de Retiro, Intención de retiro, Traslado no Factible, Intención de renuncia - Traslados, Intención de renuncia - CAC, Intención de renuncia - Kioscos, Intención de renuncia - Redes Sociales.
   - CATEGORIA_RESOLUCION_NIVEL_2_F: RECHAZADO, NO RETENIDO, RETENIDO, NO GESTIONADO, NO CONTACTADO, SE ACTUALIZA, PROCEDE, PROCEDE, TRASLADO DENTRO DE COBERTURA
   - FECHA_CREACION: fecha en que ingresó la intención
-  - CLAVE PRIMARIA CON INVENTARIO: (posiblemente IDENTIFICACION)
+  - CLAVE PRIMARIA CON INVENTARIO: ID_SERVICIO
 
-Kiosko:
+KIOSKO:
   - CATEGORIZACION_OPERACIONAL_N2: Intención de renuncia - Kiosko
   - TIPOLOGIA_GESTION: RETENIDO, NO RETENIDO, NO RETENIDO - TRASLADO FUERA DE COBERTURA
   - FECHA_INGRESO: Fecha en que ingresó la intención
   - CLAVE PRIMARIA con INVENTARIO: SUBSCRIBER_ID
+  - Averiguar qué significa NFILAF
+
 
 Barra: PENDIENTE
 
 ¿Qué representa “Retenidos Total”? Si el mismo ID_SERVICIO fue retenido dos veces durante septiembre, ¿cuenta como 2 retenciones o como 1 cliente retenido? Esta decisión cambia completamente el KPI.
 
 
-¿Cómo identificamos que la retención tuvo descuento? El query actual busca una oferta suplementaria utilizando ID_SERVICIO = SUBSCRIBER_ID, dentro del mismo mes y activada después de la gestión.   Query tablero Necesitamos decidir si esa regla es válida para nuestro tablero.
-La tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO es una fotografía diaria del inventario de servicios FIJOS, es decir, si un cliente tiene activado una oferta suplementaria durante 1 mes, aparecerá en la tabla inventario 30 veces. 
-- los descuentos aplicados por retención son conocidos como ofertas suplementarias y se diferencian del resto de servicios activos por SUBSCRIBER_ID mediante la columna TIPO_SERVICIO = 'SUPLEMENTARIO'
+¿Cómo identificamos que la retención tuvo descuento? El query actual busca una oferta suplementario utilizando ID_SERVICIO = SUBSCRIBER_ID, dentro del mismo mes y activada después de la gestión.   Query tablero Necesitamos decidir si esa regla es válida para nuestro tablero.
+La tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO es una fotografía diaria del inventario de servicios FIJOS, es decir, si un cliente tiene activado una oferta suplementario durante 1 mes, aparecerá en la tabla inventario 30 veces. 
+- los descuentos aplicados por retención son conocidos como ofertas suplementarios y se diferencian del resto de servicios activos por SUBSCRIBER_ID mediante la columna TIPO_SERVICIO = 'SUPLEMENTARIO'
 - TIPO_SERVICIO = 'PRIMARIA'; indica el servicio contratado de forma inicial del cliente, es decir, el primer servicio que contrató, lo suplementario es las promociones, descuentos, etc aplicados a ese servicio.
 - DESCRIPCION_PLAN indica el tipo de servicio, ejemplo si TIPO_SERVICIO = 'SUPLEMENTARIO', DESCRIPCION_PLAN = 'DESCUENTO RETENCION 50% POR 6 MESES TV' (si DESCRIPCION_PLAN LIKE '%RETENCION%', columna BUSSINESS_CATEGORY = 'DESCUENTO' no confirmado, hacer join con base intenciones para comprobar)
-- FECHA_ACTIVACION_SUP indica la fecha ('2026-10-01 01:01:01') en que sea activó la oferta suplementaria (el descuento mediante retención)
+- FECHA_ACTIVACION_SUP indica la fecha ('2026-10-01 01:01:01') en que sea activó la oferta suplementario (el descuento mediante retención)
 - FECHA_VENCIMIENTO_SUP indica la fecha en que vencerá el descuento aplicado en FECHA_ACTIVACION_SUP ambas columnas poseeran datos si existe un desc activo, sino será NULL
   
 
@@ -45,13 +47,38 @@ En OID_DB.OID_DB.OID_INVENTARIO_FIJO
 Evaluaremos las alternativas:
 PENDIENTE
 
-¿Qué fecha manda en el tablero? Mi recomendación inicial sería utilizar FECHA_GESTION/FECHA_CREACION para ubicar la retención en el mes, no FECHA_ACTIVACION_SUP. Pero tenemos que confirmarlo.
-FECHA_ACTIVACION_SUP indica la fecha en que se activó la oferta suplementaria (descuento), Esta debe coincidir con la FECHA_INGRESO 
-
-¿Qué debe ocurrir si una intención es el 30 de septiembre y el descuento se activa el 1 de octubre? El query actual la perdería porque exige que oferta e intención estén en el mismo YYYYMM.   Query tablero Para retención real, posiblemente deberíamos utilizar una ventana de días y no “mismo mes”.
-PENDIENTE:
+¿Qué debe ocurrir si una intención es el 30 de septiembre y el descuento se activa el 1 de octubre? El query actual la perdería porque exige que oferta e intención estén en el mismo YYYYMM. 
+Query tablero Para retención real, posiblemente deberíamos utilizar una ventana de días y no “mismo mes”.
+Mmm, deberíamos usar siempre el día de registro de la oferta, y usar la FECHA_ACTIVACION_SUP como corroboración de la activacion, pero la FECHA_INGRESO, o FECHA CREACION manda.
 
 ¿Cómo vamos a utilizar FECHA_PROCESO de OID_INVENTARIO_FIJO? Como ya determinaste, esa tabla es una fotografía diaria. Es fundamental decidir qué fotografía representa correctamente el estado que queremos analizar y, al mismo tiempo, evitar recorrer innecesariamente millones de registros.
+OID_INVENTARIO_FIJO será nuestra tabla de dimensiones, las tablas de hechos serán la tablas de intenciones, ahora, FECHA_PROCESO deberá ser consultada para corroborar la activación de la oferta suplementario y acceder a las demás columnas necesarias para el tablero
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APUNTES:
+
+-“Cuando una intención de Kiosko termina como RETENIDO, ¿existe alrededor de esa gestión un registro en OID_INVENTARIO_FIJO con TIPO_SERVICIO = 'SUPLEMENTARIA' y BUSSINESS_CATEGORY = 'DESCUENTO', y esos registros parecen realmente descuentos otorgados por retención?”
+- Las intenciones registradas como retenidas (con descuento y con otra tipología de resolución) están repetidas por Subscriber ID en la tabla INTENCIONES KIOSKO, esto podría implicar doble registro e inflar la suma de descuento aplicado
+- La Orden de trabajo no está repetida, además la hora es distinta. ¿Por qué si se retiene en primera instancia, se repite la ID_ORDEN_TRABAJO?
+- N_FILAF siempre es 1 
+- ID_ORDEN_TRABAJO no se encuentra rapetido
+- Revisando SUBSCRIBER_ID = '25115514'; mismo que se indica como RETENIDO en gestión de KIOSKO el '2026-10-01' dos veces y con distintos ID, este no se repite en INVENTARIO, dando a entender que el problema fue del CAC; Posible solución: Tomar el más reciente si es descuento.
 
   
