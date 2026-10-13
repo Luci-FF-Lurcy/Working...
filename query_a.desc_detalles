@@ -67,8 +67,22 @@ OID_INVENTARIO_FIJO será nuestra tabla de dimensiones, las tablas de hechos ser
 
 
 
+A RESOLVER:
+- Si un mismo cliente es retenido dos veces, pero en primera instancia se lo retuvo con descuento, y en la segunda con mantenimiento, el descuento aplicado en primera instancia se inactiva?
+- Cuándo pega un descuento, en la próxima factura o k
 
+- Repetir este ejercicio con todas las agrupaciones de DESCRIPCION_PLAN:
+    SELECT
+        (SUM(CASE WHEN TARIFA_BASICA_BI IS NULL THEN 1 ELSE 0 END)/
+        SUM(CASE WHEN TARIFA_BASICA_BI IS NOT NULL THEN 1 ELSE 0 END)) AS porcentaje_de_nulos
+    FROM OID_DB.OID_DB.OID_INVENTARIO_FIJO
+    WHERE FECHA_PROCESO = '2026-10-11'
+      AND TIPO_SERVICIO = 'SUPLEMENTARIA'
+      AND BUSINESS_CATEGORY = 'DESCUENTO'
+      AND DESCRIPCION_PLAN = 'Descuento retencion 50% por 3 meses';
 
+- Comprobar si todas los retenidos en el canal KIOSKO mediante descuento tienen una tarifa basica visible
+- Comprobar si todos los retenidos en el canal KIOSKO se identifican en INVENTARIO como TIPO_SERVICIO = 'SUPLEMENTARIA' ; BUSSINESS_CATEGORY = 'DESCUENTO'
 
 
 
@@ -79,6 +93,6 @@ APUNTES:
 - La Orden de trabajo no está repetida, además la hora es distinta. ¿Por qué si se retiene en primera instancia, se repite la ID_ORDEN_TRABAJO?
 - N_FILAF siempre es 1 
 - ID_ORDEN_TRABAJO no se encuentra rapetido
-- Revisando SUBSCRIBER_ID = '25115514'; mismo que se indica como RETENIDO en gestión de KIOSKO el '2026-10-01' dos veces y con distintos ID, este no se repite en INVENTARIO, dando a entender que el problema fue del CAC; Posible solución: Tomar el más reciente si es descuento.
+- Revisando SUBSCRIBER_ID = '25115514'; mismo que se indica como RETENIDO en gestión de KIOSKO el '2026-10-01' dos veces y con distintos ID, este no se repite en INVENTARIO, La explicación es que un mismo cliente que fue retenido en primera ocasión, vuelve a presentar la intención, a veces el mismo día, a veces en días diferentes. Solución: Tomar el registro más reciente de la tabla de intenciones siempre y cuando el registro sea "RETENIDO" mediante descuento.
 
-  
+
