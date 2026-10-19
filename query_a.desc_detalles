@@ -3,6 +3,8 @@ CANALES DISPONIBLES: Inbound, Kiosko, Barra.
 TECNOLOGÍA: GPON, HFC
 FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 
+- Los descuentos aplicados en retención son aplicado proporcionalmente a lo que corresponde en cada factura
+- Si un plan contiene multiples servicios, estos se reflejaran en inventario como multiples registros, uno asociado a cada servicio
 - La tabla inventario será la tabla Dimensiones
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
@@ -94,5 +96,213 @@ APUNTES:
 - N_FILAF siempre es 1 
 - ID_ORDEN_TRABAJO no se encuentra rapetido
 - Revisando SUBSCRIBER_ID = '25115514'; mismo que se indica como RETENIDO en gestión de KIOSKO el '2026-10-01' dos veces y con distintos ID, este no se repite en INVENTARIO, La explicación es que un mismo cliente que fue retenido en primera ocasión, vuelve a presentar la intención, a veces el mismo día, a veces en días diferentes. Solución: Tomar el registro más reciente de la tabla de intenciones siempre y cuando el registro sea "RETENIDO" mediante descuento.
+- Un mismo CLIENTE (identificado mediante IDENTIFICACION) puede tener más de un SUBSCRIBER_ID
+-
+-
+-
+
+
+
+PENDIENTES:
+1. DISEÑO DE QUERY
+
+  1.1) INVENTARIO — OID_DB.OID_DB.OID_INVENTARIO_FIJO
+      1.1.1) Confirmar el nombre exacto de la columna BUSSINESS_CATEGORY y los valores que contiene.
+         R: La columna se llama BUSINESS_CATEGORY y solo cuando TIPO_SERVICIO = 'SUPLEMENTARIA' puede tener los siguientes registros:
+            BUSINESS_CATEGORY, OTROS_INTERNET, VOZ_ILIMITADO, TV_RETENCION, PUNTO_CABLEADO, TELEFONOS, BROWNFIELD, DESCUENTO, PERMIN, PROMOCIONES, PROMOCION, CLARO BOX TV, VOZ_CUPO, BLOQUEO, TV_PAQUETE_SD, Claro_Video, VOZ_FF, PROMOCIONES VELOCIDAD, EXTENSOR_WIFI, INSTALACION, OTRO, TV_RENTA_EQUIPOS_SD, TV_RENTA_EQUIPOS_HD, HBOMAX_INC, TV_PAQUETE_HD, HBO_MAX, COMBO, AMAZON_PRIME_INC, NO_APLICA, NULL, VOZ_LDI_CUPO, AMAZON_PRIME
+
+      1.1.2) Comprobar si TIPO_SERVICIO = 'SUPLEMENTARIA' AND BUSSINESS_CATEGORY = 'DESCUENTO' identifica correctamente las ofertas de descuento que pueden ser utilizadas para retención.
+          R: 
+
+      1.1.3) Averiguar qué registros SUPLEMENTARIA + DESCUENTO no corresponden a descuentos de retención.
+         PENDIENTE: Cruzar todas las intenciones retenidas y averiguar su DESCRIPCION_PLAN e ID_PLAN
+
+      1.1.4) Listar los distintos DESCRIPCION_PLAN existentes para TIPO_SERVICIO = 'SUPLEMENTARIA' AND BUSSINESS_CATEGORY = 'DESCUENTO'.
+         R: 
+
+      1.1.5) Relacionar cada DESCRIPCION_PLAN de descuento con su ID_DETALLE_PLAN.
+         
+      1.1.6) Comprobar si existen descuentos de retención cuya DESCRIPCION_PLAN no contenga la palabra RETENCION.
+         PENDIENTE: Cruzar todas las intencines retenidas y averiguar si su DESCRIPCION_PLAN, no contiene la palabra RETENCION
+
+      1.1.7) Comparar los ID_DETALLE_PLAN encontrados con los ID_DETALLE_PLAN utilizados como herramientas de retención en Query tablero.sql.
+         R:
+
+      1.1.8) Determinar qué combinación de columnas identifica una oferta suplementaria única.
+         R:
+
+      1.1.9) Validar si SUBSCRIBER_ID + ID_DETALLE_PLAN + FECHA_ACTIVACION_SUP puede utilizarse como identificador de una oferta única.
+         R:
+
+      1.1.10) Comprobar cuántas veces aparece una misma oferta debido a las distintas fotografías de FECHA_PROCESO.
+         R:
+
+      1.1.11) Definir la regla para deduplicar las fotografías diarias sin eliminar ofertas diferentes del mismo SUBSCRIBER_ID.
+         R:
+
+      1.1.12) Comprobar si una misma oferta puede presentar diferentes FECHA_VENCIMIENTO_SUP entre fotografías.
+         R:
+
+      1.1.13) Comprobar si FECHA_ACTIVACION_SUP mantiene siempre el mismo valor para una misma oferta durante todas las fotografías.
+         R:
+
+      1.1.14) Determinar si la hora incluida en FECHA_ACTIVACION_SUP corresponde a la hora real de activación o es una hora generada por el sistema.
+         R:
+
+      1.1.15) Determinar qué rango de FECHA_PROCESO debe consultarse para encontrar las ofertas asociadas a las intenciones sin recorrer innecesariamente todo el inventario.
+         R:
+
+      1.1.16) Identificar qué columna de inventario permite distinguir la familia: INTERNET, TELEFONÍA y TELEVISIÓN.
+         R:
+
+      1.1.17) Identificar qué columna de inventario representa la tecnología del servicio y comprobar su homologación con HFC y GPON.
+         R:
+
+      1.1.18) Averiguar si un mismo SUBSCRIBER_ID puede presentar más de una fila TIPO_SERVICIO = 'PRIMARIA' dentro de la misma FECHA_PROCESO.
+         R:
+
+      1.1.19) Si existen varias filas PRIMARIA para un SUBSCRIBER_ID, determinar qué columnas permiten identificar correctamente INTERNET, TELEFONÍA y TELEVISIÓN.
+         R:
+
+      1.1.20) Confirmar que TARIFA_BASICA_BI de los registros TIPO_SERVICIO = 'PRIMARIA' representa el valor del servicio necesario para calcular el descuento.
+         R: Representa el valor, pero de quienes
+
+      1.1.21) Averiguar cuántos registros PRIMARIA presentan TARIFA_BASICA_BI IS NULL, agrupados por familia y tecnología.
+         R:
+
+      1.1.22) Investigar por qué existen valores NULL en TARIFA_BASICA_BI.
+         R:
+
+      1.1.23) Determinar qué fotografía de inventario debe utilizarse para obtener TARIFA_BASICA_BI: fecha de gestión, fecha de activación de oferta o fotografía inmediatamente posterior.
+         R:
+
+      1.1.24) Averiguar si TARIFA_BASICA_BI puede cambiar para un mismo servicio a lo largo del período analizado.
+         R:
+
+      1.1.25) Determinar de dónde se obtendrá el porcentaje exacto de descuento: DESCRIPCION_PLAN, ID_DETALLE_PLAN u otra columna.
+         R:
+
+      1.1.26) Identificar ofertas de descuento que no sean porcentuales, por ejemplo gratuidades, montos fijos u otros beneficios.
+         R:
+
+      1.1.27) Determinar cómo calcular la duración del descuento utilizando FECHA_ACTIVACION_SUP, FECHA_VENCIMIENTO_SUP o la descripción de la oferta.
+         R:
+
+  1.2) KIOSKO — SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+      1.2.1) Confirmar que TIPOLOGIA_GESTION = 'RETENIDO' identifica correctamente todas las gestiones retenidas que deben incluirse en el análisis.
+         
+      1.2.2) Confirmar si ID_ORDEN_TRABAJO identifica de manera única una gestión Kiosko.
+         
+      1.2.3) Averiguar si existen ID_ORDEN_TRABAJO duplicados y, de existir, identificar qué diferencia esos registros.
+         
+      1.2.4) Determinar exactamente qué representa NFILAF y por qué el query heredado utiliza NFILAF = 1.
+         
+      1.2.5) Confirmar si es necesario mantener NFILAF = 1 en el nuevo query.
+         
+      1.2.6) Cuantificar cuántos SUBSCRIBER_ID presentan más de una gestión RETENIDO durante el mismo mes.
+         
+      1.2.7) Cuantificar cuántos SUBSCRIBER_ID presentan más de una gestión RETENIDO durante el mismo día.
+         
+      1.2.8) Confirmar que las múltiples filas de un mismo SUBSCRIBER_ID corresponden a nuevas intenciones reales y no a duplicados.
+         
+      1.2.9) Determinar qué gestión debe recibir una oferta cuando un mismo SUBSCRIBER_ID presenta varias gestiones RETENIDO cercanas a la activación del descuento.
+         
+      1.2.10) Validar la regla provisional de seleccionar la gestión RETENIDO más reciente compatible temporalmente con la oferta.
+         
+      1.2.11) Determinar cómo resolver dos gestiones retenidas del mismo SUBSCRIBER_ID realizadas el mismo día si FECHA_ACTIVACION_SUP no posee una hora confiable.
+         
+      1.2.12) Analizar cuántos días transcurren entre FECHA_INGRESO y FECHA_ACTIVACION_SUP para los casos que aparentemente corresponden a retención mediante descuento.
+         
+      1.2.13) Averiguar qué porcentaje de ofertas se activa el mismo día, 1 día después, 2–3 días después, 4–7 días después y más de 7 días después de FECHA_INGRESO.
+         
+      1.2.14) Definir la ventana temporal máxima permitida para asociar una oferta de inventario con una gestión Kiosko.
+         
+      1.2.15) Determinar qué hacer cuando una gestión ocurre al final de un mes y la oferta se activa al inicio del mes siguiente.
+         
+      1.2.16) Confirmar que SUBSCRIBER_ID es la clave correcta para relacionar Kiosko con OID_INVENTARIO_FIJO.
+         
+      1.2.17) Cuantificar gestiones RETENIDO cuyo SUBSCRIBER_ID no encuentre coincidencia en inventario.
+         
+      1.2.18) Validar los valores existentes en SUBPRODUCTO_HOMOLOGADO_FINAL y confirmar su homologación con INTERNET, TELEFONÍA y TELEVISIÓN.
+         
+      1.2.19) Validar los valores existentes en TECNOLOGIA_FINAL1 y confirmar el tratamiento de HFC y GPON.
+         
+      1.2.20) Averiguar cuántos registros retenidos presentan SUBSCRIBER_ID, FECHA_INGRESO, familia o tecnología NULL.
+         
+      1.2.21) Utilizar SUBSCRIBER_ID = '25115514' como caso de control para comprobar que una única oferta no sea asignada a múltiples gestiones retenidas.
+         
+      1.2.22) Determinar si el KPI “Retenidos Total” debe contar todas las gestiones RETENIDO o un único SUBSCRIBER_ID por período.
+         
+      1.2.23) Determinar si una gestión puede tener más de una oferta real de descuento y cómo debe representarse sin duplicar la gestión.
+         
+
+    1.3) INBOUND — SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
+      1.3.1) Confirmar que CATEGORIA_RESOLUCION_NIVEL_2_F = 'RETENIDO' identifica correctamente las gestiones retenidas que deben incorporarse al dashboard.
+         
+      1.3.2) Identificar cuál campo o combinación de campos representa una gestión Inbound única.
+         
+      1.3.3) Confirmar que ID_SERVICIO de Inbound corresponde a SUBSCRIBER_ID de OID_INVENTARIO_FIJO.
+         
+      1.3.4) Validar con una muestra de servicios que ID_SERVICIO = SUBSCRIBER_ID devuelve el cliente/servicio correcto en inventario.
+         
+      1.3.5) Cuantificar gestiones retenidas cuyo ID_SERVICIO no encuentre coincidencia en inventario.
+         
+      1.3.6) Determinar exactamente qué representa NFILAF y si debe utilizarse NFILAF = 1.
+         
+      1.3.7) Determinar exactamente qué representa RNR y por qué el query heredado utiliza RNR = 1.
+         
+      1.3.8) Validar si la lógica utilizada actualmente para construir RNR incluye únicamente las gestiones que deben formar parte del nuevo dashboard.
+         
+      1.3.9) Revisar los valores de CATEGORIZACION_OPERACIONAL_N2 y definir cuáles pertenecen realmente al universo de intenciones de retiro.
+         
+      1.3.10) Revisar los valores de CATEGORIA_RESOLUCION_NIVEL_2_F y definir cuáles deben excluirse del universo de análisis.
+         
+      1.3.11) Confirmar que FECHA_CREACION será homologada como FECHA_GESTION.
+         
+      1.3.12) Validar el campo utilizado como familia y su homologación con INTERNET, TELEFONÍA y TELEVISIÓN.
+         
+      1.3.13) Validar el campo utilizado como tecnología y su homologación con HFC y GPON.
+         
+      1.3.14) Cuantificar ID_SERVICIO que presentan múltiples gestiones RETENIDO durante el mismo mes.
+         
+      1.3.15) Cuantificar ID_SERVICIO que presentan múltiples gestiones RETENIDO durante el mismo día.
+         
+      1.3.16) Determinar si para Inbound debe aplicarse la misma regla de asignar la oferta a la gestión RETENIDO compatible más reciente.
+         
+      1.3.17) Analizar la diferencia temporal entre FECHA_CREACION y FECHA_ACTIVACION_SUP.
+         
+      1.3.18) Determinar si la ventana temporal gestión-oferta será la misma que para Kiosko o si debe variar por canal.
+         
+      1.3.19) Averiguar cuántos registros retenidos presentan ID_SERVICIO, FECHA_CREACION, familia o tecnología NULL.
+         
+    
+
+    1.4) BARRA — SANDBOX.SAC_RET.FIJO_INTENCION_BARRA
+      1.4.1) Identificar qué columna determina si una gestión terminó RETENIDO o NO RETENIDO.
+         
+      1.4.2) Identificar qué columna representa la fecha real de la gestión y debe homologarse como FECHA_GESTION.
+         
+      1.4.3) Confirmar que SUBSCRIBER_FINAL corresponde a SUBSCRIBER_ID de inventario.
+         
+      1.4.4) Identificar qué campo o combinación de campos representa una gestión Barra única.
+         
+      1.4.5) Determinar exactamente qué representa RNR y por qué el query heredado utiliza RNR = 1.
+         
+      1.4.6) Determinar exactamente qué representa NFILAFF y por qué el query heredado utiliza NFILAFF = 1.
+         
+      1.4.7) Confirmar si ambos filtros RNR = 1 y NFILAFF = 1 deben mantenerse en el nuevo query.
+         
+      1.4.8) Validar SUBPRODUCTO_HOMOLOGADO_FF como campo de familia y confirmar INTERNET, TELEFONÍA y TELEVISIÓN.
+         
+      1.4.9) Validar TECNOLOGIA_FINAL_F como campo de tecnología y confirmar HFC y GPON.
+         
+      1.4.10) Analizar si un mismo servicio puede presentar múltiples gestiones retenidas y cómo deben relacionarse con una oferta.
+         
+      1.4.11) Determinar si la misma regla temporal de asignación gestión-oferta utilizada en Kiosko puede aplicarse a Barra.
+         
+      1.4.12) Cuantificar registros con identificador de servicio, fecha, familia o tecnología NULL.
+         
+
+2) DISEÑO DEL DASHBOARD 
 
 
