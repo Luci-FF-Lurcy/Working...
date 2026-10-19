@@ -6,6 +6,14 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 - Los descuentos aplicados en retención son aplicado proporcionalmente a lo que corresponde en cada factura
 - Si un plan contiene multiples servicios, estos se reflejaran en inventario como multiples registros, uno asociado a cada servicio
 - La tabla inventario será la tabla Dimensiones
+- ID_DETALLE_PLAN de inventario constituye la identificación de DESCRIPCION_PLAN,siendo descripción plan la identificación de del tipo de oferta suplementaria activada (Descuento)
+- Un cliente puede tener múltiples intenciones en mulitples canales de retención
+- Una intención 
+- Desde inventario se extrae el descuento y se averigua de qué canal proviene, Esto porque en primer lugar un cliente puede tener multiples intenciones y ser retenido multiples veces con 'DESCUENTO'.
+
+IDEAS:
+- Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
+- Contabilizar los clientes que fueron retenidos con DESCUENTO y posterior (Reincidencia) fue retenido con otra herramienta, o viceversa
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
 Existe una tabla de intenciones por canal las columnas que especifican el resultado de la gestións son:
