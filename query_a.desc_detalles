@@ -10,6 +10,9 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 - Un cliente puede tener múltiples intenciones en mulitples canales de retención
 - Una intención 
 - Desde inventario se extrae el descuento y se averigua de qué canal proviene, Esto porque en primer lugar un cliente puede tener multiples intenciones y ser retenido multiples veces con 'DESCUENTO'.
+- Cuando un cliente tiene un bundle contratado, Las intenciones atendidas pueden reflejarse en multiples registros, uno por cada Servicio que se tenga.
+- La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después
+- La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después. Es decir, solo cuenta una oferta que pudo ser consecuencia de esa gestión.
 
 IDEAS:
 - Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
@@ -143,7 +146,7 @@ PENDIENTES:
          R:
 
       1.1.10) Comprobar cuántas veces aparece una misma oferta debido a las distintas fotografías de FECHA_PROCESO.
-         R:
+         R: Aparece en la misma cantidad de días consultados en FECHA PROCESO, es decir, aparece una vez por día
 
       1.1.11) Definir la regla para deduplicar las fotografías diarias sin eliminar ofertas diferentes del mismo SUBSCRIBER_ID.
          R:
