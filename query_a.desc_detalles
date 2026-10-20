@@ -13,6 +13,7 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 - Cuando un cliente tiene un bundle contratado, Las intenciones atendidas pueden reflejarse en multiples registros, uno por cada Servicio que se tenga.
 - La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después
 - La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después. Es decir, solo cuenta una oferta que pudo ser consecuencia de esa gestión.
+- SUBSCRIBER_ID es único por cada usuario, Un mismo usuario (identificado por IDENTIFICACIÓN) puede tener un SUBSCRIBER_ID por cada servicio que tenga (Internet, telefonía, televisión)
 
 IDEAS: Son aquellas ideas para mejorar el entregable o realizar mejoras a largo plazo (post entrega)
 - Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
