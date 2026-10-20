@@ -1,0 +1,33 @@
+Objetivo primario de la etapa
+Identificar, clasificar y cuantificar los descuentos de retención activados durante septiembre de 2026, utilizando exclusivamente la tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO, con el propósito de determinar la cantidad de descuentos únicos otorgados, sus porcentajes, duración, familia de servicio y tecnología asociada, eliminando las duplicidades generadas por las fotografías diarias del inventario y construyendo una base de información confiable para el posterior desarrollo del dashboard.
+
+Objetivos secundarios
+1. Identificar los descuentos de retención registrados en inventario.
+Analizar las columnas TIPO_SERVICIO, BUSINESS_CATEGORY, ID_DETALLE_PLAN y DESCRIPCION_PLAN para identificar qué registros corresponden a descuentos de retención, diferenciándolos de otras ofertas suplementarias. Validar si los criterios de clasificación permiten reconocer todos los descuentos existentes.
+
+2. Identificar y contabilizar las activaciones únicas de descuentos.
+Analizar las fotografías diarias de FECHA_PROCESO para establecer una regla de deduplicación que permita identificar cada activación real de descuento mediante SUBSCRIBER_ID, ID_DETALLE_PLAN y FECHA_ACTIVACION_SUP, previa validación de su unicidad. Evitar que un mismo descuento sea contabilizado varias veces por permanecer activo durante varios días.
+
+3. Determinar el porcentaje y la duración de los descuentos.
+Examinar DESCRIPCION_PLAN e ID_DETALLE_PLAN para clasificar los descuentos según su porcentaje de aplicación (por ejemplo, 15%, 25% o 50%) y su duración (3, 6 o 12 meses, entre otras modalidades). Complementar esta información con FECHA_ACTIVACION_SUP y FECHA_VENCIMIENTO_SUP para identificar la vigencia prevista de cada oferta y registrar los casos que no puedan clasificarse.
+
+4. Clasificar los descuentos por familia y tecnología.
+Identificar las columnas de inventario que permitan asociar cada descuento con su familia de servicio (Internet, Telefonía o Televisión) y tecnología (HFC o GPON). Validar cómo se representan estos atributos cuando un cliente posee varios servicios contratados o un paquete de servicios (bundle), evitando clasificaciones incorrectas.
+
+5. Cuantificar y caracterizar los descuentos de septiembre de 2026.
+Determinar la cantidad total de activaciones únicas, los servicios beneficiados (SUBSCRIBER_ID) y la distribución de los descuentos por tipo de plan, porcentaje, duración, familia y tecnología. Identificar servicios que recibieron múltiples descuentos durante el período.
+
+6. Construir una consulta SQL optimizada para Netezza.
+Desarrollar una consulta que consolide las reglas validadas de identificación, deduplicación, clasificación y cuantificación, utilizando exclusivamente OID_INVENTARIO_FIJO. Priorizar filtros temporales eficientes y evitar procesamientos innecesarios sobre millones de registros.
+
+
+Entregable de hoy
+Una consulta SQL inicial, validada para septiembre de 2026, que genere una base de activaciones únicas de descuentos de retención, incluyendo:
+Identificador del servicio (SUBSCRIBER_ID).
+Código y descripción del descuento (ID_DETALLE_PLAN, DESCRIPCION_PLAN).
+Fecha de activación y vencimiento del descuento.
+Porcentaje y duración del beneficio.
+Familia de servicio y tecnología asociada.
+Cantidad de descuentos únicos y servicios beneficiados, con posibilidad de agregación por las categorías anteriores.
+Alcance y exclusiones: El análisis se limitará exclusivamente a los descuentos activados durante septiembre de 2026 e identificados en la tabla Inventario. No se realizarán cruces con tablas de intenciones, atribución de descuentos a canales o asesores, análisis de permanencia ni cálculos de valores económicos. Los porcentajes, duraciones, familias y tecnologías que no puedan determinarse de manera confiable quedarán identificados como pendientes de validación.
+Criterio de éxito: Conocer cuántos descuentos únicos se activaron durante septiembre de 2026, qué porcentaje y duración tienen, a qué familias y tecnologías corresponden y cuántos servicios fueron beneficiados, sin duplicidades derivadas de las fotografías diarias.
