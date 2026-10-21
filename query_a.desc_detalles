@@ -1,3 +1,11 @@
+OBJETIVO GENERAL:
+  PRESENTAR UN DASHBOARD QUE IDENTIFIQUE:
+  - Tabla de retenidos mediante descuentos por mes: 
+  - Tabla de seguimiento de retenidos mediante descuentos:
+  - Tabla resumen del porcentaje de retención con descuento por canal:
+  - Tabla de efectividad por asesor:
+
+
 NOTAS: Son aquellas observaciones del giro del negocio, de las tablas, etc.
 CANALES DISPONIBLES: Inbound, Kiosko, Barra.
 TECNOLOGÍA: GPON, HFC
@@ -11,7 +19,8 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 - Una intención 
 - Desde inventario se extrae el descuento y se averigua de qué canal proviene, Esto porque en primer lugar un cliente puede tener multiples intenciones y ser retenido multiples veces con 'DESCUENTO'.
 - Cuando un cliente tiene un bundle contratado, Las intenciones atendidas pueden reflejarse en multiples registros, uno por cada Servicio que se tenga.
-- La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después
+- Cuando un cliente tiene un Bundle contratado, y es Retenido mediante un descuento en todo el Bundle; en inventario aparecerá con oferta suplementaria asociado a cada servicio dentro del Bundle.
+- Un cliente puede tener tantos Subscriber ID asociados a su IDENTIFICACION según cuantos servicios PRIMARIOS tiene contratados. Además puede tener múltiples Servicios Primarios a su nombre.
 - La oferta se une a la intención solo si cumple tres condiciones: es el mismo servicio, es del mismo mes de la intención y se activó el mismo día de la intención o después. Es decir, solo cuenta una oferta que pudo ser consecuencia de esa gestión.
 - SUBSCRIBER_ID es único por cada usuario, Un mismo usuario (identificado por IDENTIFICACIÓN) puede tener un SUBSCRIBER_ID por cada servicio que tenga (Internet, telefonía, televisión)
 - Una retención presenta una fecha de activación de oferta suplementaria cuando la herramienta de retención es un descuento (oferta suplementaria)
@@ -55,6 +64,18 @@ KIOSKO:
 
 
 Barra: PENDIENTE
+
+OID_INVENTARIO_OFERTAS_FIJO: Tabla que lleva el registro de todas las ofertas suplementarias activadas:
+  - OFFERING_ID = ID_DETALLE_PLAN: Código de DETALLE_PLAN
+  - FECHA_ACTIVACION = FECHA_ACTIVACION_SUP
+  - FECHA_INACTIVACION
+  - OFFERING_NAME = DETALLE_PLAN
+  - ID_SERVICIO = SUBSCRIBER_ID
+  - EMPLOYEE_CODE Código del empleado que aplicó el Descuento
+  - EMPLOYEE_NAME: Nombre del empleado que aplicó Descuento
+  - 
+
+
 
 ¿Qué representa “Retenidos Total”? Si el mismo ID_SERVICIO fue retenido dos veces durante septiembre, ¿cuenta como 2 retenciones o como 1 cliente retenido? Esta decisión cambia completamente el KPI.
 
@@ -103,6 +124,7 @@ OID_INVENTARIO_FIJO será nuestra tabla de dimensiones, las tablas de hechos ser
 A RESOLVER: Es aquella traba que podría generar un mal query.
 - Si un mismo cliente es retenido dos veces, pero en primera instancia se lo retuvo con descuento, y en la segunda con mantenimiento, el descuento aplicado en primera instancia se inactiva?
 - Cuándo pega un descuento, en la próxima factura o k
+- 
 
 - Repetir este ejercicio con todas las agrupaciones de DESCRIPCION_PLAN:
     SELECT
