@@ -1,5 +1,7 @@
 Objetivo primario de la etapa
-Identificar, clasificar y cuantificar los descuentos de retención activados durante septiembre de 2026, utilizando exclusivamente la tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO, con el propósito de determinar la cantidad de descuentos únicos otorgados, sus porcentajes, duración, familia de servicio y tecnología asociada, eliminando las duplicidades generadas por las fotografías diarias del inventario y construyendo una base de información confiable para el posterior desarrollo del dashboard.
+Identificar, clasificar y cuantificar los descuentos de retención activados durante septiembre de 2026, utilizando exclusivamente la tabla OID_DB.OID_DB.OID_INVENTARIO_FIJO, 
+con el propósito de determinar la cantidad de descuentos únicos otorgados, sus porcentajes, duración, familia de servicio y tecnología asociada, 
+eliminando las duplicidades generadas por las fotografías diarias del inventario y construyendo una base de información confiable para el posterior desarrollo del dashboard.
 
 Objetivos secundarios
 1. Identificar los descuentos de retención registrados en inventario.
