@@ -1,54 +1,17 @@
+---
+Crea un query para relacionar las tablas OID_INVENTARIO_OFERTAS_FIJO con la de INVENTARIO de forma que pueda comparar cuales ofertas activadas no estoy considerando
 
-WITH OFERTAS_UNICAS AS (
-    SELECT
-        SUBSCRIBER_ID,
-        ID_DETALLE_PLAN,
-        FECHA_ACTIVACION_SUP,
+Toma en cuenta estos apuntes de la primera tabla: 
+OID_INVENTARIO_OFERTAS_FIJO: Tabla que lleva el registro de todas las ofertas suplementarias activadas:
+  - OFFERING_ID = ID_DETALLE_PLAN: Código de DETALLE_PLAN
+  - FECHA_ACTIVACION = FECHA_ACTIVACION_SUP
+  - FECHA_INACTIVACION = FECHA_VENCIMIENTO_SUP
+  - OFFERING_NAME = DETALLE_PLAN
+  - ID_SERVICIO = SUBSCRIBER_ID
+  - EMPLOYEE_CODE Código del empleado que aplicó el Descuento
+  - EMPLOYEE_NAME: Nombre del empleado que aplicó Descuento
+  
 
-        MAX(
-            CASE
-                WHEN FECHA_PROCESO < DATE '2026-10-02'
-                THEN 1 ELSE 0
-            END
-        ) AS CORTE_ORIGINAL,
 
-        MAX(
-            CASE
-                WHEN FECHA_PROCESO >= DATE '2026-10-02'
-                THEN 1 ELSE 0
-            END
-        ) AS CORTE_ADICIONAL
 
-    FROM OID_DB.OID_DB.OID_INVENTARIO_FIJO
 
-    WHERE TIPO_SERVICIO = 'SUPLEMENTARIA'
-      AND FECHA_ACTIVACION_SUP >= DATE '2026-09-01'
-      AND FECHA_ACTIVACION_SUP < DATE '2026-10-01'
-      AND FECHA_PROCESO >= DATE '2026-09-01'
-      AND FECHA_PROCESO < DATE '2026-10-12'
-      AND SUBSCRIBER_ID IS NOT NULL
-      AND ID_DETALLE_PLAN IS NOT NULL
-
-    GROUP BY
-        SUBSCRIBER_ID,
-        ID_DETALLE_PLAN,
-        FECHA_ACTIVACION_SUP
-)
-
-SELECT
-    SUM(CORTE_ORIGINAL) AS OFERTAS_QUERY_ORIGINAL,
-
-    SUM(
-        CASE
-            WHEN CORTE_ORIGINAL = 0
-             AND CORTE_ADICIONAL = 1
-            THEN 1 ELSE 0
-        END
-    ) AS OFERTAS_ADICIONALES,
-
-    COUNT(*) AS TOTAL_OFERTAS_AMPLIADO,
-
-    COUNT(DISTINCT SUBSCRIBER_ID)
-        AS SERVICIOS_UNICOS
-
-FROM OFERTAS_UNICAS;
