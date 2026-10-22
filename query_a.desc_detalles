@@ -31,12 +31,14 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
   - Desconozco la lógica detrás de la tabla INVENTARIO DE OFERTAS, pero existen ofertas activadas que no se contemplan en INVENTARIO y puede deberse a que INVENTARIO ya tenía una oferta activada, Entonces probablemente las ofertas activadas las tome de las tablas de intenciones sin comprobar si no fueron activadas
   - Existen múltiples registros de ofertas en el mismo ID_SERVICIO en INVENTARIO DE OFERTAS en el mismo día, pero al verificar en las piscinas, esas activaciones no se dieron
   - Hay Ofertas con FECHA_ACTIVACION y FECHA_INACTIVACION iguales. Averiguar si estás son las que no aparecen en inventario, No, hay también Ofertas con diferencia de activación de 1 día que no están en Inventario. Hasta ahora la conclusión sigue siendo que ya tenían una oferta activa en inventario, por eso no se volvió a activar
-  - 
+  - Entre los canales Kiosko e Inboud se gestiona al redor del 91% de las intenciones de internet, el mismo valor son para las intenciones globales,
+  - La distribución de las intenciones son: Kiosko: 59,76%; CC Inbound y RRSS: 31,71%; Barra: 7,47%; Instant Call: 1,06%
 
 IDEAS: Son aquellas ideas para mejorar el entregable o realizar mejoras a largo plazo (post entrega)
 - Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
 - Contabilizar los clientes que fueron retenidos con DESCUENTO y posterior (Reincidencia) fue retenido con otra herramienta, o viceversa
 - Para lograr trazabilidad de los clientes donde se aplican descuentos, puede correlacionarse la diferencia
+- Antes de inactivar un servicio por mora, debería hacerse una llamada para conocer los motivos, quizás dejó de pagar por una inconformidad en el servicio
 
 
 APUNTES: Son aquellos planteados en forma de preguntas que no revelan información de las tablas.
@@ -57,11 +59,14 @@ APUNTES: Son aquellos planteados en forma de preguntas que no revelan informaci�
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
 Existe una tabla de intenciones por canal las columnas que especifican el resultado de la gestións son:
+
+
 INBOUND:
   - CATEGORIZACIÓN_OPERACIONAL_N2: Intención de renuncia - Inbound, Intencion de Retiro, Intención de retiro, Traslado no Factible, Intención de renuncia - Traslados, Intención de renuncia - CAC, Intención de renuncia - Kioscos, Intención de renuncia - Redes Sociales.
   - CATEGORIA_RESOLUCION_NIVEL_2_F: RECHAZADO, NO RETENIDO, RETENIDO, NO GESTIONADO, NO CONTACTADO, SE ACTUALIZA, PROCEDE, PROCEDE, TRASLADO DENTRO DE COBERTURA
   - FECHA_CREACION: fecha en que ingresó la intención
   - CLAVE PRIMARIA CON INVENTARIO: ID_SERVICIO
+
 
 KIOSKO:
   - CATEGORIZACION_OPERACIONAL_N2: Intención de renuncia - Kiosko
@@ -72,7 +77,22 @@ KIOSKO:
   - FILTRAR ÚNICAMENTE POR FUENTE = 'REMEDY' por tener trazabilidad
 
 
-Barra: PENDIENTE
+BARRA: PENDIENTE
+  - FECHA: Fecha de creación de orden: 
+  - SUBSCRIBER_FINAL = SUBSCRIBER_ID
+  - IDENTIFICACION = IDENTIFICACION (la misma de inventario donde se muestra cédula, ruc o pasaporte del cliente)
+  No hay información aparentemente que indique si un cliente es Retenido.  
+
+INSTANT CALL:
+  - ID_SERVICIO = SUBSCRIBER_ID
+  - FECHA_CREACION: Fecha de ingreso de la intención, está en Formato TIME '2026-01-19 13:51:08'
+  - ID_ORDEN_TRABAJO: Identificador único de la intención
+  - CATEGORIZACION_OPERACIONAL_N3: Motivo de intención
+  - USUARIO_CREADOR: Codigo del asesor que gestiona intención (pero no la resulve)
+  - NOMBRE_COMPLETO_ASESOR_CREA_ORDEN: nombre completo del asesor que crea la orden
+  - CATEGORIA_RESOLUCION_NIVEL_2F: Conclusión de la Intención (RETENIDO, NO RETENIDO, NO CONTACTADO, RECHAZADO)
+  - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención utilizada (si es retenido, muestra la herramienta, sino, muestra motivo de intención, puede variar a CATEGORIZACION_OPERACIONAL_N3)
+  - NOMBRE_ASESOR_ASIGNADO: Asesor que gestiona la intención (y la resulve) 
 
 OID_INVENTARIO_OFERTAS_FIJO: Tabla que lleva el registro de todas las ofertas suplementarias activadas:
   - OFFERING_ID = ID_DETALLE_PLAN: Código de DETALLE_PLAN
