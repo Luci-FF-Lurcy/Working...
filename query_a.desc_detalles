@@ -27,10 +27,16 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
 - En INVENTARIO, columna EJECUTIVO presuntamente se encuentra quién activó la oferta suplementaria
 - En INVENTARIO, un cliente puede tener una oferta activa, no llegar a su fecha de expiración, y sin embargo, ser removida de inventario. (Subscriber: 1000265433)
 - LAS OFERTAS SUPLEMENTARIAS (SEGÚN INVENTARIO DE OFERTAS) ACTIVADAS EN SEPTIEMBRE = 6274
+- Todas las ofertas suplementarias contempladas en el INVENTARIO DE OFERTAS no se ven reflajadas en el INVENTARIO oficial
+  - Desconozco la lógica detrás de la tabla INVENTARIO DE OFERTAS, pero existen ofertas activadas que no se contemplan en INVENTARIO y puede deberse a que INVENTARIO ya tenía una oferta activada, Entonces probablemente las ofertas activadas las tome de las tablas de intenciones sin comprobar si no fueron activadas
+  - Existen múltiples registros de ofertas en el mismo ID_SERVICIO en INVENTARIO DE OFERTAS en el mismo día, pero al verificar en las piscinas, esas activaciones no se dieron
+  - Hay Ofertas con FECHA_ACTIVACION y FECHA_INACTIVACION iguales. Averiguar si estás son las que no aparecen en inventario, No, hay también Ofertas con diferencia de activación de 1 día que no están en Inventario. Hasta ahora la conclusión sigue siendo que ya tenían una oferta activa en inventario, por eso no se volvió a activar
+  - 
 
 IDEAS: Son aquellas ideas para mejorar el entregable o realizar mejoras a largo plazo (post entrega)
 - Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
 - Contabilizar los clientes que fueron retenidos con DESCUENTO y posterior (Reincidencia) fue retenido con otra herramienta, o viceversa
+- Para lograr trazabilidad de los clientes donde se aplican descuentos, puede correlacionarse la diferencia
 
 
 APUNTES: Son aquellos planteados en forma de preguntas que no revelan información de las tablas.
@@ -46,7 +52,7 @@ APUNTES: Son aquellos planteados en forma de preguntas que no revelan informaci�
 - Cómo cruzo las bajas
 - Existen Fechas de activación de las que no logro la trazabilidad: 1000120041 (Descuento retencion 50% por 6 meses) (Se deberá a los retenidos que no se registran en barra. No, no hay registro, se fregó la webada)
 - Puedo tomar la tabla OID_DB.OID_DB.OID_INVENTARIO_OFERTAS_FIJO
-
+- Realizar una tabla global de intenciones (SANDBOX) UNION ALL donde pueda dar trazabilidad de las intenciones registradas. 
 
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
