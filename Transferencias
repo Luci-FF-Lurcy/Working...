@@ -1,22 +1,41 @@
 ---
-Imagen: hoja de Tableau "Validación de fechas"
-Imagen: hoja de Tableau "Validación de fechas" (versión en tabla)
+Imagen: hoja de Tableau "Control diciembre 2025"
 Descripción para otra IA
 
-Es la misma hoja de Tableau,"Validación de fechas", pero ahora en formato de tabla de texto. Tiene dos dimensiones como encabezados de fila a la izquierda, FECHA_PROCESO y Fecha Gestion. A la derecha hay una sola columna de valores con el encabezado general"Periodo Reporte" y el subencabezado"2026-01". Las fechas están en formato día/mes/año. La columna Fecha Gestion se ve en gris más claro, y la tabla termina con una fila"Total general".
+Es una hoja de trabajo de Tableau titulada "Control diciembre 2025", en formato de tabla de texto con una sola dimensión y una medida. La configuración de la hoja es esta:
 
-FECHA_PROCESO	Fecha Gestion	Periodo Reporte 2026-011/1/2026	5/1/2026	7
-2/1/2026	5/1/2026	17
-3/1/2026	5/1/2026	19
-4/1/2026	5/1/2026	12
-5/1/2026	5/1/2026	643
-Total general		698
+Páginas: vacío.
+Columnas: vacío.
+Filas: FECHA_PROCESO, una píldora azul (discreta) a nivel de fecha exacta, es decir, día por día.
+Filtros: cuatro píldoras azules: SUBPRODUCTO (no se ve qué valores tiene seleccionados), IDENTIF. MASIVO: MASIVO, ES_PRIMER_REGISTRO: True y SERVICIO (tampoco se ve su selección). A diferencia de la hoja principal, aquí no hay filtros de mes sobre FECHA_INGRESO_SOL ni sobre FECHA_PROCESO.
+Marcas: tipo "Automático", que se muestra como texto. Solo Texto tiene asignada una píldora, REC(FECHA_PROCESO), en verde (continua). El resto de los botones (Color, Tamaño, Detalle y Descripción emergente) está vacío.
 
-Las cinco fechas de proceso, del jueves 1 al lunes 5 de enero de 2026, tienen la misma fecha de gestión, el lunes 5/1/2026, y todas cuentan en el periodo 2026-01. Lo del propio lunes son 643 registros (92%). Lo que se trasladó suma 55: 7 del jueves 1, 17 del viernes 2, 19 del sábado 3 y 12 del domingo 4. El total, 698, coincide con la vista anterior.
+La tabla tiene una sola columna de encabezados de fila, con el título truncado "FECHA_PR..", y una columna de valores sin encabezado. Las fechas están en formato día/mes/año, con sombreado alterno en las filas. A la derecha hay una barra de desplazamiento vertical, así que la tabla tiene más filas que las visibles. No se ve una fila de total.
 
-Esta tabla también corrige mi descripción anterior. La etiqueta "31 dic" de aquella vista era solo el margen del eje y no corresponde a datos de diciembre. Los valores reales van del 1 al 5 de enero, y en el gráfico estaban en orden inverso, con el 1/1 abajo.
+FECHA_PROCESO	Día	Registros1/1/2026	Jueves	7
+2/1/2026	Viernes	17
+3/1/2026	Sábado	19
+4/1/2026	Domingo	12
+5/1/2026	Lunes	643
+6/1/2026	Martes	170
+7/1/2026	Miércoles	215
+8/1/2026	Jueves	239
+9/1/2026	Viernes	238
+10/1/2026	Sábado	39
+11/1/2026	Domingo	12
+12/1/2026	Lunes	215
 
-Puntos a revisar
-El viernes 2/1 se trasladó al lunes. Según la regla, eso solo es correcto si ese día fue feriado o descanso decretado. El 2 de enero no estaba en la lista de feriados que usé antes, tomada del informe de bajas fijo. Confirma si fue feriado. Si no lo fue, esas 17 solicitudes deberían quedarse en el 2/1.
-No aparecen los dos últimos días laborables de diciembre de 2025. Por la regla de cierre de mes, el martes 30 y el miércoles 31 de diciembre deberían sumar en 2026-01, y no están. Revisa si la base incluye diciembre de 2025 o si algún filtro los excluye.
-La validación usa FECHA_PROCESO y no FECHA_INGRESO_SOL. Las reglas de SAC Stefany Cortez se refieren a cuándo ingresa la solicitud. Conviene confirmar que la fecha de gestión se calcula sobre la fecha de ingreso.
+La columna "Día" la agregué yo; no aparece en la imagen. Las 12 filas visibles suman 1.826 registros.
+
+Lo que muestra
+
+No hay datos de diciembre de 2025. Aunque el título dice "diciembre 2025", la tabla está ordenada por fecha y su primera fila es el 1/1/2026. Como esta hoja no tiene filtros de mes, la base de la consulta empieza el 1 de enero. Eso explica por qué en la validación anterior no aparecían el 30 y el 31 de diciembre. El periodo 2026-01 no incluye los dos últimos días laborables de diciembre, porque esos datos no se extraen. Para que la regla de cierre funcione en enero, la consulta SQL tiene que empezar antes, como mínimo en los últimos días laborables de diciembre de 2025.
+
+El patrón diario respalda la regla de traslado:
+
+Días laborables normales (del 7 al 9 y el 12 de enero): entre 215 y 239 registros.
+Fines de semana normales (10 y 11 de enero): 39 y 12. Los sábados y domingos casi no hay movimiento, por eso tiene sentido sumarlos al lunes.
+Lunes 5/1: 643 registros, casi el triple de un día normal. Acumula lo que se represó durante el feriado del 1 de enero y el fin de semana.
+Viernes 2/1: solo 17 registros, un volumen de día no laborable y no de un viernes normal (cerca de 238). Eso sugiere que fue un día de descanso, lo que justificaría haberlo trasladado al lunes en la hoja "Validación de fechas". Aun así, conviene confirmar que fue feriado o descanso decretado y agregarlo a la lista de feriados si corresponde.
+
+Una precisión: estos conteos son por FECHA_PROCESO, con el filtro de primer registro. Muestran cuándo se procesa cada solicitud por primera vez, no necesariamente cuándo ingresó. Eso refuerza la recomendación de calcular la fecha de gestión sobre FECHA_INGRESO_SOL.
