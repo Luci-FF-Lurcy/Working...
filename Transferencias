@@ -1,12 +1,89 @@
 ---
-Resumen
--	Sabado y  domingo tienen que estar sumada las solicitudes del lunes
--	Si es feriado viernes, las solicitudes de viernes, sábado y domingo, deben sumar en las solicitudes del lunes
--	Los dos últimos días laborales, deben sumar en las solicitudes del mes siguiente. Por ejemplo los dos últimos días de septiembre laborales, tienen que sumar en las solicitudes en el mes de octubre
+Tablero de Solicitudes Port Out: descripción y tarea de ajuste
+1. Contexto
 
-Transcripción:
-Lo que ingresa sábado y domingo; Por ejemplo: las solicitudes del jueves, las veo el viernes, el número, recién. Las del viernes, recién las veo el lunes, y las del lunes, que vienen a ser sábado, domingo y lunes, recién las veo el martes. Entonces sábado y domingo tienen que estar sumadas a las solicitudes del lunes. Si es feriado viernes, por ejemplo, serían las solicitudes viernes, sábado, domingo, lunes, deben estar en las solicitudes del lunes. Si son fines de mes, los dos últimos días laborales, tienen que ir al siguiente mes. Por ejemplo, los dos últimos días de septiembre laborales, tienen que sumar en las solicitudes en el mes de octubre.
+El tablero da seguimiento a las solicitudes de portabilidad de salida (port out) del segmento masivo, es decir, los clientes que piden llevarse su número a otra operadora. Es parte del seguimiento de bajas móviles que se actualiza a diario y se reporta a la jefatura.
 
+Cada solicitud pasa por varios estados:
+
+Entrada: queda en revisión manual.
+Si se aprueba: se programa y termina con la línea inactivada.
+Si se rechaza: se cierra, normalmente por deuda o por problemas de documentos.
+
+Por norma, el trámite no puede durar más de dos días hábiles. En la base de datos, cada cambio de estado se registra como una fila nueva, así que una misma solicitud aparece varias veces. El tablero debe medir solicitudes, no bajas, por lo que incluye todos los casos sin importar cómo terminaron.
+
+2. Qué se observa en el tablero
+
+El libro de Tableau se llama "Solicitudes port out" y tiene dos hojas, "Hoja 1" y "Hoja 1 (2)". La vista que se describe es la Hoja 1. Toma los datos de una consulta SQL personalizada sobre la base OID_DB.
+
+Campos de la fuente de datos. Hay datos del cliente (cuenta de facturación, identificación, nombre, tipo de suscriptor y contrato), del plan (descripción, ID de plan y subproducto) y del trámite:
+
+Identificadores: ID de portabilidad, número secuencial e ID del subproducto de la solicitud.
+Seguimiento: estado, observación, operadora receptora, servicio (número de línea) y usuario que gestionó.
+Tres fechas: fecha de ingreso de la solicitud, fecha de proceso (fecha de cada movimiento del trámite) y fecha programada de ejecución.
+Tres campos calculados: un identificador de segmento (IDENTIF. MASIVO), una marca de primer registro (ES_PRIMER_REGISTRO, verdadero o falso) y la primera fecha de proceso de cada servicio en el mes (PRIMERA_FECHA_SERVICIO). Esta marca sirve para quedarse con una sola fila por línea en cada mes.
+Detalle menor: el campo ESTADO tiene asignado por error un rol geográfico (icono de globo).
+
+Estructura de la vista:
+
+Columnas: el mes de la fecha de proceso.
+Filas: el subproducto.
+Valor de cada celda: el recuento de filas con fecha de proceso.
+Filtros activos: mes de la fecha de ingreso, subproducto, segmento = MASIVO, primer registro = verdadero, servicio y mes de la fecha de proceso. Es decir, hay dos filtros de mes, uno por cada fecha.
+
+Prepago no aparece en la tabla, así que queda excluido por el filtro de subproducto.
+
+Datos que muestra la tabla. Tiene cuatro subproductos más una fila de total, para los meses de enero a octubre de 2026:
+
+Subproducto	Ene	Feb	Mar	Abr	May	Jun	Jul	Ago	Sep	OctAUT	1.304	1.280	1.348	1.056	997	897	876	854	808	780
+INT.WTTX	8	14	14	1	2	–	4	3	5	–
+POSTPAGO	3.499	3.295	3.701	3.121	2.884	2.908	2.790	2.629	2.740	2.805
+TAR	70	64	89	70	58	76	102	98	102	114
+Total	4.881	4.653	5.152	4.248	3.941	3.881	3.772	3.584	3.655	3.699
+
+La barra de estado indica 48 marcas, 5 filas por 10 columnas y un total acumulado de 41.466 registros.
+
+Lectura de los datos:
+
+Total: baja de 4.881 en enero a 3.699 en octubre (−24,2%). El pico fue marzo, con 5.152, y el mínimo agosto, con 3.584. Septiembre y octubre se estabilizan.
+POSTPAGO: es el grupo más grande, alrededor de tres cuartas partes del total. Cae −19,8% en el periodo.
+AUT: es el que más cae, −40,2%, de forma casi continua desde marzo.
+TAR: es el único que crece (+62,9%), aunque con volúmenes pequeños.
+INT.WTTX: es marginal y no tiene registros en junio ni en octubre.
+
+Según la nomenclatura interna, AUT corresponde a pospago, así que la evolución de pospago podría estar repartida en dos filas.
+
+3. Por qué se debe ajustar
+
+El tablero asigna cada solicitud a un mes según la fecha de proceso de su primer movimiento, no según el momento en que el equipo la recibe para gestionarla. Eso genera dos tipos de problema:
+
+Las solicitudes caen en un día o mes distinto al de su gestión. Las que entran en fin de semana, en feriado o al cierre del mes no quedan en el periodo en que realmente se trabajan. Esta es la observación que hizo SAC Stefany Cortez.
+
+Hay riesgos de construcción que pueden alterar los conteos:
+
+Una solicitud con movimientos en dos meses puede contarse en ambos.
+La medida cuenta filas, no solicitudes únicas.
+Los dos filtros de mes, aplicados a la vez, pueden excluir casos que sí corresponden.
+4. Reglas a aplicar
+
+Según lo que solicitó SAC Stefany Cortez, cada solicitud se cuenta el día en que el equipo la recibe para gestionarla:
+
+Fines de semana: las solicitudes de sábado y domingo se suman a las del lunes.
+Feriados: las de un feriado se suman al siguiente día laborable. Por ejemplo, si el viernes es feriado, las de viernes, sábado y domingo se suman al lunes.
+Cierre de mes: las de los dos últimos días laborables de un mes se suman al mes siguiente. Por ejemplo, las del 29 y 30 de septiembre de 2026 cuentan en octubre.
+Orden: primero se traslada la fecha al día laborable que corresponda y, con esa fecha, se evalúa el cierre de mes. Por eso, una solicitud que entra en fin de semana y cuyo lunes siguiente cae en el mes siguiente o en uno de los dos últimos días laborables también pasa al mes siguiente.
+5. Modificaciones requeridas en el tablero
+Fecha de referencia: el mes de cada solicitud debe salir de su fecha de ingreso ajustada según las reglas, no de la fecha de proceso.
+Calendario laboral: el tablero debe reconocer fines de semana y feriados nacionales de 2026 para saber cuál es el siguiente día laborable y cuáles son los dos últimos días laborables de cada mes.
+Nueva columna de mes: las columnas deben mostrar el mes de gestión resultante, en lugar del mes de la fecha de proceso.
+Medida: debe contar solicitudes únicas, de modo que cada una aparezca una sola vez y en un solo mes.
+Filtros: hay que revisar los filtros de mes y de primer registro para que no dupliquen ni excluyan casos con la nueva lógica. Los filtros de segmento masivo y de subproducto se mantienen.
+Subproductos: hay que confirmar si AUT y POSTPAGO se presentan juntos como pospago o por separado.
+Validación: se debe incluir un detalle o vista de control con los casos que cambiaron de día o de mes, para que la solicitante confirme que las reglas se aplicaron como pidió.
+Consideraciones al presentar:
+La distribución entre meses cambiará respecto a la tabla actual.
+Octubre aparecerá parcialmente en noviembre por la regla de cierre.
+La lista de feriados debe mantenerse actualizada si el gobierno traslada alguno.
 
 
 
