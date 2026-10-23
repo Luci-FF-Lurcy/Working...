@@ -1,4 +1,102 @@
 ---
+Tablero "Solicitudes port out" en Tableau: descripción detallada
+1. Entorno general
+
+La captura muestra Tableau Desktop en español, con la ventana titulada "Tableau - Solicitudes port out". El libro está abierto en la hoja "Hoja 1", que es una tabla de texto (tabla cruzada) con recuentos por subproducto y por mes.
+
+En la parte superior está la barra de menús: Archivo, Datos, Hoja de trabajo, Dashboard, Historia, Análisis, Mapa, Formato, Servidor, Ventana y Ayuda. Debajo, la barra de herramientas tiene el selector de ajuste de vista en "Estándar" y el botón "Mostrarme" a la derecha.
+
+En la parte inferior hay tres pestañas: "Fuente de datos", "Hoja 1" (la activa) y "Hoja 1 (2)", que parece un duplicado de la hoja principal y cuyo contenido no se ve. A continuación aparecen los botones para crear una hoja, un dashboard y una historia.
+
+2. Fuente de datos
+
+La fuente es una "Consulta SQL personalizada (OID_DB)", es decir, una consulta escrita a mano contra la base OID_DB y no una tabla conectada directamente.
+
+3. Panel de datos (lista de campos)
+
+El panel izquierdo tiene activa la pestaña Datos (la otra es Análisis), un buscador y la sección "Carpetas". Los campos aparecen en este orden, con el tipo que indica su icono.
+
+Dimensiones:
+
+Campo	Tipo según icono	ObservaciónCUENTA_BSCS	Texto (Abc)	Cuenta de facturación del cliente
+DESCRIPCION_PLAN	Texto	Nombre del plan
+ES_PRIMER_REGISTRO	Calculado, booleano (=T|F)	Verdadero/Falso; marca la primera fila de cada línea
+ESTADO	Rol geográfico (icono de globo)	Estado del trámite. Tiene asignado por error un rol de mapa. Está resaltado (seleccionado) en la captura
+FECHA_INGRESO_SOL	Fecha	Fecha en que ingresó la solicitud
+FECHA_PROCESO	Fecha	Fecha de cada movimiento o cambio de estado
+FECHA_PROGRAMADA	Fecha	Fecha programada de ejecución de la portabilidad
+ID_PLAN	Texto	Identificador del plan
+ID_PORTABILIDAD	Texto	Identificador del trámite
+ID_SUBPRODUCTO_SOLICITUD	Texto	Subproducto declarado en la solicitud
+IDENTIF. MASIVO	Calculado, texto (=Abc)	Clasifica el segmento (MASIVO / CORPORATIVO)
+IDENTIFICACION	Texto	Cédula o RUC
+NOMBRE_COMPLETO	Texto	Nombre del cliente
+NUMERO_SECUENCIAL	Texto	Número secuencial del trámite
+OBSERVACION	Texto	Detalle del estado, por ejemplo el motivo de rechazo
+OPERADORA_RECEPTORA	Texto	Código de la operadora de destino
+PRIMERA_FECHA_SERVICIO	Calculado, fecha (=📅)	Primera fecha de proceso de cada servicio en el mes
+SERVICIO	Texto	Número de línea
+SUBPRODUCTO	Texto	Tipo de producto (AUT, POSTPAGO, TAR, INT.WTTX, etc.)
+TIPO_SUSCRIPTOR	Texto	Individual / No aplica
+USUARIO	Texto	Usuario que gestionó el trámite
+Nombres de medidas	Campo automático de Tableau	Generado por Tableau
+
+Medidas (debajo de una línea separadora):
+
+Campo	Tipo	ObservaciónCONTRATO	Numérico (#)	Número de contrato, tratado como medida
+Consulta SQL personalizada (Recuento)	Numérico, automático	Conteo de filas de la fuente
+Latitud (generada)	Geográfico, automático	Se ve cortado al final de la lista. Lo genera Tableau por el rol geográfico de ESTADO
+4. Configuración de la vista (estantes)
+Páginas: vacío.
+Columnas: MES(FECHA_PROCESO). Es una píldora azul (discreta) con un signo "+", lo que indica una jerarquía de fecha que se puede expandir. Al ser MES y no MES/AÑO, los meses se muestran sin año: si hubiera datos de varios años, se sumarían en el mismo mes.
+Filas: SUBPRODUCTO, píldora azul discreta.
+Filtros: seis píldoras azules. En la captura no se ve qué valores tienen seleccionados, salvo cuando el filtro muestra el valor en su nombre.
+Filtro	Valor visibleMES(FECHA_INGRESO_SOL)	No visible
+SUBPRODUCTO	No visible. Prepago/PPA no aparece en la tabla, así que probablemente está excluido
+IDENTIF. MASIVO	MASIVO
+ES_PRIMER_REGISTRO	True
+SERVICIO	No visible
+MES(FECHA_PROCESO)	No visible
+Marcas: tipo "Automático", que aquí se muestra como texto. Están los botones Color, Tamaño, Texto, Detalle y Descripción emergente. Solo Texto tiene asignada una píldora: REC(FECHA_PROCESO), en verde (continua). Es decir, cada celda cuenta las filas que tienen fecha de proceso.
+5. La tabla (Hoja 1)
+
+La tabla tiene el título "Hoja 1" y el encabezado general de columnas "FECHA_PROCESO". El encabezado de filas dice "SUBPRODU.." y la última fila "Total gener..", ambos truncados por el ancho; el mes "septie.." también aparece cortado. Las filas tienen sombreado alterno y los números usan punto como separador de miles.
+
+SUBPRODUCTO	enero	febrero	marzo	abril	mayo	junio	julio	agosto	septiembre	octubreAUT	1.304	1.280	1.348	1.056	997	897	876	854	808	780
+INT.WTTX	8	14	14	1	2	(vacío)	4	3	5	(vacío)
+POSTPAGO	3.499	3.295	3.701	3.121	2.884	2.908	2.790	2.629	2.740	2.805
+TAR	70	64	89	70	58	76	102	98	102	114
+Total general	4.881	4.653	5.152	4.248	3.941	3.881	3.772	3.584	3.655	3.699
+
+Las celdas vacías significan que no hay registros. No es un cero mostrado. La tabla incluye totales generales por columna, pero no por fila.
+
+Totales por subproducto (calculados, no visibles en la tabla):
+
+Subproducto	Total ene–oct	ParticipaciónPOSTPAGO	30.372	73,2%
+AUT	10.200	24,6%
+TAR	843	2,0%
+INT.WTTX	51	0,1%
+Total	41.466	100%
+6. Barra de estado
+
+La barra inferior muestra "48 marcas", "5 filas por 10 columnas" y "SUMA de REC(FECHA_PROCESO): 41.466". Los datos son consistentes entre sí:
+
+Las 48 marcas salen de 4 subproductos × 10 meses = 40, menos 2 celdas vacías de INT.WTTX, más 10 totales.
+La suma de los totales mensuales da exactamente 41.466.
+
+A la derecha aparece un indicador con el número 3 cuyo significado no se distingue en la captura.
+
+7. Tendencias de la tabla
+Total: baja de 4.881 en enero a 3.699 en octubre (−24,2%). El pico es marzo (5.152) y el mínimo agosto (3.584). Septiembre y octubre se recuperan levemente.
+POSTPAGO: −19,8% (de 3.499 a 2.805). Repunta en marzo y sube de nuevo en septiembre y octubre.
+AUT: −40,2% (de 1.304 a 780). Cae de forma casi continua desde marzo.
+TAR: +62,9% (de 70 a 114). Es el único que crece; su salto se da desde julio.
+INT.WTTX: volumen marginal e irregular, sin registros en junio ni en octubre.
+8. Lógica de conteo que implica la configuración
+Cada fila de la fuente es un movimiento de una solicitud, no una solicitud. Por eso el tablero depende del filtro ES_PRIMER_REGISTRO = True para quedarse con una fila por servicio en cada mes.
+Ese primer registro se basa en PRIMERA_FECHA_SERVICIO, que es la fecha mínima de proceso por servicio y por mes. Por eso el mes que se muestra corresponde a la fecha de proceso, no a la fecha de ingreso de la solicitud.
+La medida cuenta filas (REC), no servicios distintos.
+Hay dos filtros de mes activos al mismo tiempo, uno sobre la fecha de ingreso y otro sobre la fecha de proceso.
 
 
 
