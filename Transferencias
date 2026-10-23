@@ -1,40 +1,51 @@
-Comparación: "Hoja 1" (tablero original) vs. "Port out - prueba calendario"
-Descripción para otra IA
+# INFORME DE AJUSTE DEL TABLERO
+**Solicitudes Port Out – Tableau Desktop**  
+**Fecha:** 23 de octubre de 2026
 
-Son dos tablas de texto de Tableau con la misma estructura: los subproductos en filas (AUT, INT.WTTX, POSTPAGO, TAR y la fila "Total general") y los meses de enero a octubre de 2026 en columnas. Los encabezados "SUBPRODU..", "Total gener.." y "septie.." aparecen truncados. Los números usan punto como separador de miles, y las celdas vacías indican que no hay registros.
+## Objetivo
 
-Imagen 1, "Hoja 1": es el tablero original. Las columnas tienen el encabezado general "FECHA_PROCESO" y los meses aparecen por nombre (enero a octubre). Cada solicitud se asigna al mes de su fecha de proceso, sin ajustes de calendario.
+Adecuar la asignación diaria y mensual de los registros de solicitudes Port Out según el calendario laboral de Ecuador, conservando la consulta SQL, la medida de recuento y los filtros de negocio originales.
 
-Imagen 2, "Port out - prueba calendario": es la versión corregida. Las columnas tienen el encabezado general "Periodo Reporte" y los meses aparecen como año-mes (2026-01 a 2026-10). Cada solicitud se asigna a su periodo de gestión: los fines de semana y feriados pasan al siguiente día laborable, y los dos últimos días laborables de cada mes pasan al mes siguiente.
+## 1. Reglas implementadas
 
-Valores de la versión corregida:
+- **Sábados y domingos:** las solicitudes procesadas durante estos días se contabilizan en el siguiente día laborable.
+- **Feriados nacionales:** las solicitudes procesadas en días feriados se trasladan al siguiente día laborable, considerando los descansos consecutivos.
+- **Cierre mensual:** las solicitudes correspondientes a los dos últimos días laborables de cada mes se contabilizan en el mes siguiente, después de aplicar el ajuste por días no laborables.
 
-Subproducto	2026-01	2026-02	2026-03	2026-04	2026-05	2026-06	2026-07	2026-08	2026-09	2026-10AUT	1.221	1.290	1.344	1.096	965	908	896	849	825	806
-INT.WTTX	8	13	15	1	2	–	4	3	5	–
-POSTPAGO	3.277	3.312	3.672	3.266	2.786	2.918	2.818	2.610	2.807	2.906
-TAR	66	60	90	76	54	74	104	99	102	118
-Total	4.572	4.675	5.121	4.439	3.807	3.900	3.822	3.561	3.739	3.830
+## 2. Procedimiento realizado
 
-Diferencia (corregida − original):
+1. **Preparación del calendario laboral:** se elaboró un archivo Excel con los feriados nacionales de Ecuador para el periodo 2025–2030, incorporando campos como FECHA_CALENDARIO, FECHA_GESTION y PERIODO_REPORTE.
 
-Subproducto	Ene	Feb	Mar	Abr	May	Jun	Jul	Ago	Sep	OctAUT	−83	+10	−4	+40	−32	+11	+20	−5	+17	+26
-INT.WTTX	0	−1	+1	0	0	–	0	0	0	–
-POSTPAGO	−222	+17	−29	+145	−98	+10	+28	−19	+67	+101
-TAR	−4	−4	+1	+6	−4	−2	+2	+1	0	+4
-Total	−309	+22	−31	+191	−134	+19	+50	−23	+84	+131
-Lo que muestran los números
+2. **Integración con Tableau:** se agregó la hoja CALENDARIO_TABLEAU a la fuente de datos existente OID_DB, relacionando FECHA_PROCESO con FECHA_CALENDARIO.
 
-El total no cambia. Las dos versiones suman exactamente 41.466, y cada subproducto mantiene su total anual: AUT 10.200, POSTPAGO 30.372, TAR 843 e INT.WTTX 51. El ajuste solo redistribuye solicitudes entre meses, sin crear ni perder casos. Eso confirma que la regla está bien aplicada.
+3. **Ajuste de la visualización:** se duplicó la hoja original y se sustituyó MES(FECHA_PROCESO) por PERIODO_REPORTE, permitiendo visualizar las solicitudes según el nuevo calendario de gestión.
 
-El efecto en cada mes depende del calendario. Cada mes recibe los dos últimos días laborables del mes anterior y entrega los suyos al mes siguiente, así que el resultado neto depende de cuánto volumen cayó en esos días.
+4. **Configuración de filtros:** se retiraron los filtros mensuales originales de la hoja ajustada y se incorporó PERIODO_REPORTE. Se conservaron los filtros de SUBPRODUCTO, segmento MASIVO, ES_PRIMER_REGISTRO y SERVICIO, así como la medida REC(FECHA_PROCESO).
 
-Enero (−309): es el caso más marcado. Pierde sus últimos días laborables (29 y 30 de enero) y no recibe nada de diciembre, porque la base empieza el 1/1/2026, como se vio en la hoja de control. Por eso enero aparece subestimado.
-Abril (+191): recibe el lunes 30 y el martes 31 de marzo, dos días laborables completos con volumen alto.
-Octubre (+131): recibe el cierre de septiembre (29 y 30) y todavía no entrega nada, porque sus dos últimos días laborables aún no ocurren. Cuando termine el mes, esas solicitudes pasarán a noviembre y la cifra de octubre bajará.
+5. **Validación y entrega:** se crearon hojas de comprobación, se compararon los resultados con el tablero original y se guardó el libro en formato .twbx, incorporando el calendario Excel.
 
-La tendencia general se mantiene, pero se suaviza. La caída entre enero y octubre pasa de −24,2% (de 4.881 a 3.699) a −16,2% (de 4.572 a 3.830), sobre todo porque enero baja y octubre sube. El pico sigue en marzo (5.121) y el mínimo en agosto (3.561).
+Durante el procedimiento no se modificó la consulta SQL personalizada ni las reglas de negocio preexistentes.
 
-Puntos a considerar antes de presentar
-Falta diciembre de 2025. Para que enero esté completo, la consulta debe traer al menos los dos últimos días laborables de diciembre de 2025. Sin eso, la comparación entre enero y febrero queda sesgada.
-Octubre es provisional. Mientras el mes no cierre, sus cifras incluyen el cierre de septiembre pero todavía no restan el propio.
-La fecha base sigue siendo FECHA_PROCESO. La validación anterior mostró que el periodo se calcula sobre FECHA_PROCESO y no sobre FECHA_INGRESO_SOL. Si SAC Stefany Cortez espera que la regla se aplique al ingreso de la solicitud, la distribución podría cambiar.
+## 3. Validación y resultados
+
+Se realizaron pruebas para verificar el funcionamiento de las tres reglas implementadas.
+
+- **Feriados y fines de semana:** se comprobó que las solicitudes del 1 al 4 de enero de 2026 se asignan al lunes 5 de enero.
+- **Cierre mensual:** se verificó que 62 registros del 29 de septiembre y 69 registros del 30 de septiembre se trasladaron a octubre, sumando 131 registros.
+- **Conciliación general:** las versiones original y ajustada mantienen un total de **41.466 registros** entre enero y octubre de 2026.
+
+Como resultado, los valores mensuales se redistribuyeron. Por ejemplo, septiembre pasó de 3.655 a 3.739 registros y octubre de 3.699 a 3.830.
+
+Estas comprobaciones confirman que el ajuste modifica la distribución mensual sin alterar el total acumulado de registros evaluados.
+
+## 4. Consideraciones para la entrega
+
+La consulta SQL original limita los registros según FECHA_INGRESO_SOL desde el 1 de enero de 2026. Por ello, aunque el calendario contempla 2025, no recupera información excluida por dicha consulta.
+
+El archivo .twbx permite incorporar el calendario laboral sin necesidad de adjuntar el Excel por separado. Sin embargo, si se modifican los feriados oficiales, será necesario actualizar el calendario y volver a guardar o publicar el libro.
+
+La publicación en Tableau Server deberá conservar la conexión y actualización de datos desde OID_DB.
+
+## 5. Conclusión
+
+Se implementaron y validaron las tres reglas de calendario solicitadas para el tablero «Solicitudes Port Out». El ajuste permite distribuir los registros según los días laborables y los cierres mensuales establecidos, manteniendo el total acumulado y respetando la estructura y las condiciones de negocio originales del tablero.
