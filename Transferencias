@@ -1,34 +1,22 @@
 ---
 Imagen: hoja de Tableau "Validación de fechas"
-Descripción general
+Imagen: hoja de Tableau "Validación de fechas" (versión en tabla)
+Descripción para otra IA
 
-Es una hoja de Tableau titulada "Validación de fechas", con fondo blanco y líneas de cuadrícula gris claro. Es una vista pequeña y vertical. Compara cuántos registros hay del periodo de reporte 2026-01 según dos fechas distintas: la fecha de proceso y la fecha de gestión.
+Es la misma hoja de Tableau,"Validación de fechas", pero ahora en formato de tabla de texto. Tiene dos dimensiones como encabezados de fila a la izquierda, FECHA_PROCESO y Fecha Gestion. A la derecha hay una sola columna de valores con el encabezado general"Periodo Reporte" y el subencabezado"2026-01". Las fechas están en formato día/mes/año. La columna Fecha Gestion se ve en gris más claro, y la tabla termina con una fila"Total general".
 
-Estructura
+FECHA_PROCESO	Fecha Gestion	Periodo Reporte 2026-011/1/2026	5/1/2026	7
+2/1/2026	5/1/2026	17
+3/1/2026	5/1/2026	19
+4/1/2026	5/1/2026	12
+5/1/2026	5/1/2026	643
+Total general		698
 
-Columnas: un solo encabezado arriba, "Periodo Reporte". Abajo, en la parte inferior, aparece su único valor: "2026-01". Hay una sola columna de datos.
+Las cinco fechas de proceso, del jueves 1 al lunes 5 de enero de 2026, tienen la misma fecha de gestión, el lunes 5/1/2026, y todas cuentan en el periodo 2026-01. Lo del propio lunes son 643 registros (92%). Lo que se trasladó suma 55: 7 del jueves 1, 17 del viernes 2, 19 del sábado 3 y 12 del domingo 4. El total, 698, coincide con la vista anterior.
 
-Filas: dos secciones apiladas, cada una con su título en texto vertical a la izquierda.
+Esta tabla también corrige mi descripción anterior. La etiqueta "31 dic" de aquella vista era solo el margen del eje y no corresponde a datos de diciembre. Los valores reales van del 1 al 5 de enero, y en el gráfico estaban en orden inverso, con el 1/1 abajo.
 
-Sección superior: "Día de FECHA_PROCESO [enero de 2026]"
-El eje vertical es continuo, de tipo fecha. La etiqueta de arriba dice "5 ene" y la de abajo "31 dic", así que el rango va del 31 de diciembre al 5 de enero, con las fechas más recientes arriba.
-Contiene cinco marcas, dibujadas como líneas horizontales azules del mismo largo y separadas a intervalos regulares. Cada una tiene una etiqueta numérica encima. De arriba hacia abajo:
-Posición	Valor1 (más cercana a "5 ene")	643
-2	12
-3	19
-4	17
-5 (más cercana a "31 dic")	7
-Suma	698
-En la imagen no se ve qué fecha exacta corresponde a cada línea; solo se ve el rango del eje.
-Sección inferior: "Día de Fecha Gestion"
-El eje vertical tiene una sola etiqueta, "2026".
-Contiene una sola marca, también una línea horizontal azul, con el valor 698.
-Qué muestra la vista
-Los totales cuadran: las 698 solicitudes del periodo 2026-01, contadas por fecha de gestión, coinciden con la suma de las cinco marcas por fecha de proceso (643 + 12 + 19 + 17 + 7 = 698).
-Se concentra en un día: el 92% del periodo (643) está en la marca más cercana al 5 de enero. Las otras cuatro reúnen 55 registros, repartidos entre el 31 de diciembre y los primeros días de enero.
-Hay registros con fecha de diciembre de 2025 que se cuentan en el periodo 2026-01.
-Puntos para interpretar
-Rango sugerente: el 31 de diciembre de 2025 fue miércoles, el 1 de enero de 2026 fue jueves y feriado, el 3 y 4 fueron fin de semana, y el 5 fue lunes. Eso es coherente con una regla que pasa los fines de semana y feriados al siguiente día laborable, y los últimos días laborables del mes al mes siguiente. Pero con la imagen no se puede confirmar a qué fecha corresponde cada valor.
-La fecha de gestión aparece por año: el eje "Día de Fecha Gestion" muestra solo "2026" y una sola marca. Eso indica que la fecha está agregada o mostrada a nivel de año, o que todas las fechas caen en un rango tan corto que el eje solo muestra el año. Con esta vista no se puede ver el detalle por día.
-Las fechas no son de ingreso: la sección superior usa FECHA_PROCESO, no la fecha de ingreso de la solicitud.
-Proporcione sus comentarios sobre BizChat
+Puntos a revisar
+El viernes 2/1 se trasladó al lunes. Según la regla, eso solo es correcto si ese día fue feriado o descanso decretado. El 2 de enero no estaba en la lista de feriados que usé antes, tomada del informe de bajas fijo. Confirma si fue feriado. Si no lo fue, esas 17 solicitudes deberían quedarse en el 2/1.
+No aparecen los dos últimos días laborables de diciembre de 2025. Por la regla de cierre de mes, el martes 30 y el miércoles 31 de diciembre deberían sumar en 2026-01, y no están. Revisa si la base incluye diciembre de 2025 o si algún filtro los excluye.
+La validación usa FECHA_PROCESO y no FECHA_INGRESO_SOL. Las reglas de SAC Stefany Cortez se refieren a cuándo ingresa la solicitud. Conviene confirmar que la fecha de gestión se calcula sobre la fecha de ingreso.
