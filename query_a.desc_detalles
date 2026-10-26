@@ -33,16 +33,20 @@ FAMILIA: INTERNET, TELEFONÍA, TELEVISIÓN
   - Hay Ofertas con FECHA_ACTIVACION y FECHA_INACTIVACION iguales. Averiguar si estás son las que no aparecen en inventario, No, hay también Ofertas con diferencia de activación de 1 día que no están en Inventario. Hasta ahora la conclusión sigue siendo que ya tenían una oferta activa en inventario, por eso no se volvió a activar
   - Entre los canales Kiosko e Inboud se gestiona al redor del 91% de las intenciones de internet, el mismo valor son para las intenciones globales,
   - La distribución de las intenciones son: Kiosko: 59,76%; CC Inbound y RRSS: 31,71%; Barra: 7,47%; Instant Call: 1,06%
+  - Existen Ofertas suplementaria (mismo ID_DETALLE_PLAN) activadas al mismo SUBSCRIBER_ID de manera intermitente, Ejemplo: Subscriber: '1001757109' tiene dos ofertas activadas en Septiembre, una del 1 al 3 y otra del 22 en adelante.
+    - Para estas ofertas, tienen una fecha de vencimiento dentro del mismo mes, es decir, tienen fecha de activación y vencimiento en el mismo mes, y adicional, tienen otra oferta suplementaria activada, es la que se repite y esta continua hasta su fecha de finalización normal.
+  - Para otro subscriber ('1000392800') Tiene dos ofertas (Mismo id detalle pla) activadas en el mismo mes, y con periodos diferente de cancelación. 
+    - Para este subscriber, tuvo dos ofertas diferentes activadas en el mismo mes, una de un mes de retención y otra de 6 meses. Aparentemente En el mismo día tuvo dos herramientas de retención aplicadas, cuando acabó una inició la otra, pero mantuvo su tiempo original (seis meses).
+    - Para resolver este problema se debería tomar la última oferta aplicada por Subscriber ID y ID_DETALLE_PLAN?
 
 IDEAS: Son aquellas ideas para mejorar el entregable o realizar mejoras a largo plazo (post entrega)
 - Categorizar las intenciones de renuncia según motivo de renuncia, además cálcular en qué motivo se aplican más descuentos
 - Contabilizar los clientes que fueron retenidos con DESCUENTO y posterior (Reincidencia) fue retenido con otra herramienta, o viceversa
 - Para lograr trazabilidad de los clientes donde se aplican descuentos, puede correlacionarse la diferencia
 - Antes de inactivar un servicio por mora, debería hacerse una llamada para conocer los motivos, quizás dejó de pagar por una inconformidad en el servicio
-
+- Cuantificar los SUBSCRIBER_ID que cuentan con una oferta activa por más de un mes seguido, debe tener misma fecha de activación sup.
 
 APUNTES: Son aquellos planteados en forma de preguntas que no revelan información de las tablas.
-
 -“Cuando una intención de Kiosko termina como RETENIDO, ¿existe alrededor de esa gestión un registro en OID_INVENTARIO_FIJO con TIPO_SERVICIO = 'SUPLEMENTARIA' y BUSSINESS_CATEGORY = 'DESCUENTO', y esos registros parecen realmente descuentos otorgados por retención?”
 - Las intenciones registradas como retenidas (con descuento y con otra tipología de resolución) están repetidas por Subscriber ID en la tabla INTENCIONES KIOSKO, esto podría implicar doble registro e inflar la suma de descuento aplicado
 - La Orden de trabajo no está repetida, además la hora es distinta. ¿Por qué si se retiene en primera instancia, se repite la ID_ORDEN_TRABAJO?
@@ -55,6 +59,7 @@ APUNTES: Son aquellos planteados en forma de preguntas que no revelan informaci�
 - Existen Fechas de activación de las que no logro la trazabilidad: 1000120041 (Descuento retencion 50% por 6 meses) (Se deberá a los retenidos que no se registran en barra. No, no hay registro, se fregó la webada)
 - Puedo tomar la tabla OID_DB.OID_DB.OID_INVENTARIO_OFERTAS_FIJO
 - Realizar una tabla global de intenciones (SANDBOX) UNION ALL donde pueda dar trazabilidad de las intenciones registradas. 
+- Quizás sea buena idea deduplicar las ofertas de inventario con las ofertas en inventario de ofertas: Cuantificar si todas las ofertas de inventario se encuentran en el inventario de ofertas.
 
 
 ¿Cómo sabemos que una gestión terminó RETENIDA? En cada canal necesito saber qué campo y qué valor significan “retenido”. Por ejemplo, en Inbound ya aparecen valores como 'RETENIDO' y 'NO RETENIDO' dentro de la lógica actual.   Query tablero Pero debemos definirlo para todos los canales.
