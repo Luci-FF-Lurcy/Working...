@@ -1,84 +1,74 @@
-Imagen: hoja de Tableau "Port out - prueba calendario" (vista por día de gestión)
-Entorno general
 
-La captura muestra Tableau Desktop en español con la hoja "Port out - prueba calendario" activa. En la parte inferior hay seis pestañas, en este orden: "Fuente de datos", "Hoja 1", "Port out - prueba calendario" (la activa), "Validación de fechas" y "Control diciembre 2025". Les siguen los botones para crear una hoja, un dashboard y una historia. La barra de menús y la de herramientas son las estándar, con el ajuste de vista en "Estándar" y el botón "Mostrarme".
+WITH INTENCIONES_UNIFICADAS AS (
 
-Panel de datos
+    SELECT
+        'INSTANTCALL' AS CANAL,
+        ID_SERVICIO,
+        IDENTIFICACION,
+        FECHA_CREACION,
+        FECHA_IMPACTO,
+        FAMILIA_FINAL,
+        TECNOLOGIA_FINAL,
+        CATEGORIA_RESOLUCION_NIVEL_2F
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INSTANTCALL
+    WHERE FECHA_IMPACTO >= DATE '2026-09-01'
+      AND FECHA_IMPACTO < DATE '2026-10-01'
+      AND CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO'
 
-El panel izquierdo, en la pestaña Datos, ya no muestra "Carpetas" sino "Tablas". Eso significa que el modelo de datos tiene dos tablas relacionadas: un calendario y la consulta de solicitudes.
+    UNION ALL
 
-Tabla 1: "CALENDARIO_TABLE..." (nombre truncado), con estos campos:
+    SELECT
+        'KIOSKO' AS CANAL,
+        SUBSCRIBER_ID,
+        IDENTIFICACION_CLIENTE,
+        FECHA_INGRESO,
+        FECHA_IMPACTO,
+        SUBPRODUCTO_HOMOLOGADO_FINAL,
+        TECNOLOGIA_FINAL1,
+        TIPOLOGIA_GESTION
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+    WHERE FECHA_IMPACTO >= DATE '2026-09-01'
+      AND FECHA_IMPACTO < DATE '2026-10-01'
+      AND NFILAF = 1
 
-Campo	Tipo según iconoCierre 2 Laborables	Texto
-Dia Semana	Texto
-Es Feriado	Texto
-Es Laborable	Texto
-Fecha Calendario	Fecha
-FECHA_GESTION	Fecha
-Mes Reporte	Fecha
-Motivo Ajuste	Texto
-Periodo Reporte	Texto
-CALENDARIO_TAB... (Recuento)	Medida automática (#, en cursiva)
+    UNION ALL
 
-Tabla 2: "Consulta SQL person..." (truncado). Es la consulta original de solicitudes. Se ven estos campos: CUENTA_BSCS, DESCRIPCION_PLAN, ESTADO (todavía con el icono de globo, es decir, con rol geográfico), FECHA_INGRESO_S... (fecha), FECHA_PROCESO (fecha), FECHA_PROGRAM... (fecha), ID_PLAN, ID_PORTABILIDAD, ID_SUBPRODUCTO..., IDENTIF. MASIVO (calculado), IDENTIFICACION y NOMBRE_COMPLE.... La lista continúa más abajo, fuera de la captura.
+    SELECT
+        'INBOUND' AS CANAL,
+        ID_SERVICIO,
+        IDENTIFICACION,
+        FECHA_CREACION,
+        FECHA_IMPACTO,
+        FAMILIA_FINAL,
+        TECNOLOGIA_FINAL,
+        CATEGORIA_RESOLUCION_NIVEL_2_F
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
+    WHERE FECHA_IMPACTO >= DATE '2026-09-01'
+      AND FECHA_IMPACTO < DATE '2026-10-01'
+      AND RNR = 1
+      AND NFILAF = 1
 
-Configuración de la vista
+    UNION ALL
 
-Páginas: vacío.
+    SELECT
+        'BARRA' AS CANAL,
+        SUBSCRIBER_FINAL,
+        IDENTIFICACION,
+        FECHA,
+        TO_DATE(MES_IMPACTO, 'YYYYMM'),
+        SUBPRODUCTO_HOMOLOGADO_FF,
+        TECNOLOGIA_FINAL_F,
+        NULL AS CATEGORIA_RESOLUCION_NIVEL_2F
+    FROM SANDBOX.SAC_RET.FIJO_INTENCION_BARRA
+    WHERE MES_IMPACTO = '202609'
+      AND RNR = 1
+      AND NFILAFF = 1
+      AND TECNOLOGIA_FINAL_F IN ('HFC', 'GPON')
+)
 
-Columnas: DÍA(FECHA_GESTION), una píldora azul (discreta) que muestra el número de día del mes, del 1 al 31, sin mes ni año.
-
-Filas: Periodo Reporte, píldora azul discreta con formato año-mes.
-
-Filtros: cinco píldoras.
-
-SUBPRODUCTO: no se ve su selección.
-IDENTIF. MASIVO: MAS... (truncado; corresponde a MASIVO).
-SERVICIO: no se ve su selección.
-Periodo Reporte.
-REGISTRO_FINAL: True. Este filtro es nuevo y reemplaza a ES_PRIMER_REGISTRO, que ya no aparece.
-
-Marcas: tipo "Automático", que se muestra como texto. En Texto está REC(SERVICIO), en verde (continua). Es un recuento de filas con servicio, no un recuento de valores distintos.
-
-Tarjeta de filtro a la derecha, "Periodo Rep...": una lista de casillas.
-
-(Todo): sin marcar.
-Unos once valores que empiezan con "2025-...": sin marcar.
-Varios valores "2026-...": marcados. La lista sigue con barra de desplazamiento.
-
-Esto indica que la base ya incluye periodos de 2025, pero están excluidos de la vista.
-
-La tabla
-
-Tiene el título "Port out - prueba calendario" y el encabezado general de columnas "FECHA_GESTION". En las filas están los periodos de 2026-01 a 2026-09, seguidos de "Total gener..". El periodo 2026-10 no aparece en la tabla. En las columnas se ven los días 1 a 12; una barra de desplazamiento horizontal indica que continúa hasta el día 31. Las celdas vacías significan que no hay registros.
-
-Periodo	1	2	3	4	5	6	7	8	9	10	11	122026-01					682	169	209	231	231			261
-2026-02		562	194	181	192	181			189	255	185	203
-2026-03		566	174	198	188	147			275	177	185	201
-2026-04	172	135				212	197	141	174	127		
-2026-05				298	166	216	161	173			234	179
-2026-06	182	106	226	153	176			222	145	171	145	149
-2026-07	126	150	127			175	147	156	155	123		
-2026-08			156	127	149	108	146				207	168
-2026-09	109	179	134	180			243	142	170	139	149	
-Total	589	1.698	1.011	1.137	1.553	1.208	1.103	1.065	1.339	992	1.105	1.161
-
-Los totales cuadran con la suma de cada columna. Por ejemplo, en el día 1: 172 + 182 + 126 + 109 = 589.
-
-Lo que muestra
-
-Las celdas vacías son los días no laborables. Coinciden con fines de semana y feriados de 2026, porque esos días no reciben solicitudes: su volumen pasa al siguiente día laborable. Eso confirma que el calendario funciona:
-
-Enero: no hay registros del 1 al 4. El 1 fue feriado, el 2 aparece como no laborable y el 3 y 4 fueron fin de semana. Todo se acumula en el lunes 5 (682).
-Abril: el 3 (Viernes Santo), el 4 y el 5 están vacíos y pasan al lunes 6 (212).
-Mayo: el 1 (feriado), el 2 y el 3 están vacíos y pasan al lunes 4 (298).
-Agosto: el 8, el 9 y el 10 (feriado) están vacíos y pasan al martes 11 (207).
-Lunes posteriores a fines de semana normales: muestran picos, por ejemplo el 2 de febrero (562), el 2 de marzo (566) y el 9 de marzo (275).
-
-Los valores de enero difieren de las hojas de control anteriores. El día 5 tiene 682, frente a 643 en "Validación de fechas", y los días 6 a 9 también varían. El cambio coincide con tres ajustes en esta hoja: el filtro pasó de ES_PRIMER_REGISTRO a REGISTRO_FINAL, la medida pasó de REC(FECHA_PROCESO) a REC(SERVICIO) y ahora hay periodos de 2025 en la base. Con la imagen no se puede saber cuál de los tres explica la diferencia.
-
-Puntos a revisar
-Octubre no aparece. No se ve si está desmarcado en el filtro o si queda fuera de la vista.
-Días 13 a 31 fuera de la captura. No se ven, así que no se puede comprobar el traslado de los dos últimos días laborables de cada mes. Ese traslado se vería en los días 29 a 31 de cada fila, bajo el periodo del mes siguiente.
-La medida cuenta filas. Si REGISTRO_FINAL no deja exactamente una fila por solicitud, REC(SERVICIO) puede contar duplicados. Un recuento de valores distintos lo evitaría.
-Los encabezados de columna muestran solo el día. Como no incluyen el mes, la misma columna junta días de meses distintos. El periodo de cada fila es lo que da el contexto del mes.
+SELECT
+    CANAL,
+    COUNT(*) AS TOTAL_INTENCIONES
+FROM INTENCIONES_UNIFICADAS
+GROUP BY CANAL
+ORDER BY CANAL;
