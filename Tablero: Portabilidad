@@ -1,0 +1,116 @@
+Contenido del archivo tableu:
+HOJAS:
+1) Descripción de “Port out - prueba calendario”
+Recuento de SERVICIO desglosado por FECHA_GESTION día vs. Periodo Reporte. Los datos se filtran en SUBPRODUCTO, IDENTIF. MASIVO, SERVICIO y REGISTRO_FINAL. El filtro SUBPRODUCTO conserva AUT, INT.WTTX, POSTPAGO y TAR. El filtro IDENTIF. MASIVO conserva MASIVO. El filtro SERVICIO conserva 106.097 de 106.097 miembros. El filtro REGISTRO_FINAL conserva True. La vista se filtra en Periodo Reporte, lo que conserva 9 de 73 miembros.
+
+Marcas
+
+El tipo de marca es Texto (Automático).
+Marcas apiladas está activado.
+Estantes
+
+Filas:	Periodo Reporte
+Columnas:	Día de FECHA_GESTION
+Filtros:	SUBPRODUCTO, IDENTIF. MASIVO, SERVICIO, Periodo Reporte, REGISTRO_FINAL
+Texto:	Recuento de SERVICIO
+Dimensiones
+
+FECHA_GESTION día tiene 31 miembros en esta hoja
+Miembros: 13; 20; 26; 28; 3; ...
+IDENTIF. MASIVO tiene 1 miembros en esta hoja
+Miembros: MASIVO
+La fórmula es 
+IF LEN(TRIM([IDENTIFICACION])) <= 10 THEN
+    "MASIVO"
+ELSE
+    "CORPORATIVO"
+END
+REGISTRO_FINAL tiene 1 miembros en esta hoja
+Miembros: True
+La fórmula es 
+[FECHA_PROCESO] = [PRIMERA_FECHA_SERVICIO]
+AND
+INT([ID_PORTABILIDAD]) = [PRIMER_ID_PORTABILIDAD]
+Periodo Reporte tiene 9 miembros en esta hoja
+Miembros: 2026-01; 2026-03; 2026-05; 2026-07; 2026-09; ...
+SERVICIO tiene 106.097 miembros en esta hoja
+Miembros: 39001146; 39001299; 39001419; 39001433; 39001499; ...
+SUBPRODUCTO tiene 4 miembros en esta hoja
+Miembros: AUT; INT.WTTX; POSTPAGO; TAR
+Medidas
+
+Recuento de SERVICIO va de 32 a 37.843 en esta hoja.
+2 tablas lógicas utilizadas para determinar el valor:
+CALENDARIO, Consulta SQL personalizada
+Detalles de fuente de datos
+
+Fuente de datos:	Consulta SQL personalizada (OID_DB)
+Tipo:	Hyper
+Versión:	2
+Base de datos:	C:/Users/aledesmm/AppData/Local/Temp/TableauTemp/436354596/Data/Solicitudes port out_v2.twb archivos/Consulta SQL personalizada (OID_DB).hyper
+Tabla:	CALENDARIO!TABLEAU_4E22182D9F504444AF7CB8D883AA03F5 (Extract.CALENDARIO!TABLEAU_4E22182D9F504444AF7CB8D883AA03F5), _92467EC1558D4A78A928332BDFD2461B (Extract._92467EC1558D4A78A928332BDFD2461B)
+2 tablas lógicas:
+CALENDARIO
+Consulta SQL personalizada
+
+
+
+
+
+
+2) Descripción de “Port out - dias consecutivos”
+Recuento de SERVICIO desglosado por Día consecutivo vs. Periodo Reporte.  Se muestran detalles para FECHA_GESTION. Los datos se filtran en SUBPRODUCTO, IDENTIF. MASIVO, SERVICIO y REGISTRO_FINAL. El filtro SUBPRODUCTO conserva AUT, INT.WTTX, POSTPAGO y TAR. El filtro IDENTIF. MASIVO conserva MASIVO. El filtro SERVICIO conserva 106.097 de 106.097 miembros. El filtro REGISTRO_FINAL conserva True. La vista se filtra en Periodo Reporte, lo que conserva 73 de 73 miembros.
+
+Marcas
+El tipo de marca es Texto (Automático).
+Marcas apiladas está activado.
+Estantes
+
+Filas:	Periodo Reporte
+Columnas:	Día consecutivo
+Filtros:	SUBPRODUCTO, IDENTIF. MASIVO, SERVICIO, Periodo Reporte, REGISTRO_FINAL
+Nivel de detalle:	FECHA_GESTION
+Texto:	Recuento de SERVICIO
+Dimensiones
+
+IDENTIF. MASIVO tiene 1 miembros en esta hoja
+Miembros: MASIVO
+La fórmula es 
+IF LEN(TRIM([IDENTIFICACION])) <= 10 THEN
+    "MASIVO"
+ELSE
+    "CORPORATIVO"
+END
+REGISTRO_FINAL tiene 1 miembros en esta hoja
+Miembros: True
+La fórmula es 
+[FECHA_PROCESO] = [PRIMERA_FECHA_SERVICIO]
+AND
+INT([ID_PORTABILIDAD]) = [PRIMER_ID_PORTABILIDAD]
+FECHA_GESTION va de 5/1/2026 a 28/10/2026 en esta hoja.
+Periodo Reporte tiene 10 miembros en esta hoja
+Miembros: 2026-02; 2026-04; 2026-06; 2026-07; 2026-09; ...
+SERVICIO tiene 106.097 miembros en esta hoja
+Miembros: 39001146; 39001299; 39001419; 39001433; 39001499; ...
+SUBPRODUCTO tiene 4 miembros en esta hoja
+Miembros: AUT; INT.WTTX; POSTPAGO; TAR
+Medidas
+
+Recuento de SERVICIO va de 32 a 793 en esta hoja.
+2 tablas lógicas utilizadas para determinar el valor:
+CALENDARIO, Consulta SQL personalizada
+Día consecutivo tiene 23 miembros en esta hoja
+Miembros: 1; 2; 3; 4; 5; ...
+La fórmula es 
+INDEX()
+Los resultados se procesan en FECHA_GESTION para cada Periodo Reporte.
+Detalles de fuente de datos
+
+Fuente de datos:	Consulta SQL personalizada (OID_DB)
+Tipo:	Hyper
+Versión:	2
+Base de datos:	C:/Users/aledesmm/AppData/Local/Temp/TableauTemp/436354596/Data/Solicitudes port out_v2.twb archivos/Consulta SQL personalizada (OID_DB).hyper
+Tabla:	CALENDARIO!TABLEAU_4E22182D9F504444AF7CB8D883AA03F5 (Extract.CALENDARIO!TABLEAU_4E22182D9F504444AF7CB8D883AA03F5), _92467EC1558D4A78A928332BDFD2461B (Extract._92467EC1558D4A78A928332BDFD2461B)
+2 tablas lógicas:
+CALENDARIO
+Consulta SQL personalizada
