@@ -1,1 +1,11 @@
-La tarea consiste en ajustar el Funnel de solicitudes de Port Out para contar servicios únicos en el periodo correcto. Actualmente, los dos últimos días laborables de cada mes se reasignan al mes siguiente, por lo que, por ejemplo, solicitudes originadas a finales de septiembre aparecen en los dos primeros días laborables de octubre; sin embargo, antes de contabilizarlas en octubre se debe validar cada SERVICIO contra todas las solicitudes ya registradas durante septiembre. Si el mismo SERVICIO ya apareció previamente en septiembre, debe excluirse del inicio de octubre porque ya fue contabilizado; si aparece por primera vez en esos últimos días, debe mantenerse como una solicitud nueva de octubre. La comparación debe realizarse por SERVICIO y no por ID_PORTABILIDAD, ya que una misma línea puede generar múltiples trámites o reingresos con diferentes identificadores. Esta depuración aplica específicamente a las solicitudes trasladadas por el cierre mensual y busca evitar que los reingresos inflen artificialmente los dos primeros días del nuevo periodo, manteniendo una única contabilización del servicio según su primera aparición.
+De acuerdo con los lineamientos no procede. El documento presentado corresponde a una carta de autorización. El documento a presentar es un poder general o especial (NOTARIAL) que contenga una cláusula de acuerdo con lo que se redactó en el documento. Considerar los siguientes escenarios.
+ 	 	 	 	 	 	 	 
+Poder apostillado	 	 	 	 	 	 
+1. Es un poder general o especial emitido en una Notaría extranjera.	 	 
+2. Se realiza la misma verificación del contenido y vigencia (incluyendo pedir la fe de no revocatoria).
+3. Viene grapado a una hoja que dice APOSTILLA. En esta hoja constan los datos del documento que se está avalando, por lo que debe coincidir los datos de fecha de emisión y de persona que firma el poder.
+4. Sin apostilla, el poder extranjero emitido en Notaría NO se puede usar en Ecuador,
+Poder en consulado	 	 	 	 	 	 
+1. Es un poder general o especial emitido en un CONSULADO ecuatoriano en el extranjero.
+2. Se realiza la misma verificación del contenido y vigencia (incluyendo pedir la fe de no revocatoria).
+3. No se realiza en Notaría y NO es una escritura pública. NO lleva apostilla.
