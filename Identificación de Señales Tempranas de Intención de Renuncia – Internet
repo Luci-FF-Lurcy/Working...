@@ -1,23 +1,24 @@
-Correo:
 
-Hola Andrés / Emilio,
 
-Para formalizar el requerimiento de Dirección, necesitamos desarrollar un análisis que permita identificar qué factores anteceden una intención de renuncia en clientes de Internet y con cuánto tiempo podríamos anticiparla, con el objetivo de habilitar acciones proactivas desde Fidelización.
 
-El análisis debe considerar:
+Pendientes:
+ - Entender NFILAF, RNR y NFILAFF, sin aplicar automáticamente los mismos filtros a todos los canales.
+ - Cómo se vería la base final de analisis? Existen diferencias entre la base descriptiva y predictiva
+ - Qué significa cerrar una incidencia sin resolver completamente el problema?
+ - Tengo muchas intenciones de renuncia que finalmente no terminaron en renuncia, pero cuál es la intención de renuncia final? como identificarla. cuándo no logra se retenida?
+ - 
 
-Intenciones de renuncia totales y por cliente único, identificando tipologías y reincidencias.
-Contactos al Call Center, reclamos y mantenimientos en los 90, 60 y 30 días previos a la primera intención.
-Frecuencia, secuencia y reincidencia de contactos, buscando determinar si existe un punto a partir del cual aumenta significativamente la probabilidad de intención, por ejemplo, segundo, tercer o siguientes contactos.
-Variables complementarias como tiempo de vida, canal de venta, ubicación geográfica y otras que resulten relevantes.
- 
-Andrés, quisiera aprovechar especialmente tu conocimiento para que, más allá de los cruces individuales, podamos desarrollar un modelo que identifique qué variables y combinaciones tienen mayor capacidad para anticipar una intención de renuncia y cuál sería el momento oportuno para intervenir.
 
-Como primer entregable necesitamos un resumen ejecutivo de las principales cifras y hallazgos, para posteriormente avanzar con el modelo y la definición de señales de alerta para la gestión preventiva.
 
-Andrés liderará el análisis y desarrollo del modelo, con la participación de Emilio en las definiciones de negocio, validación de resultados y entregable final.
-
-Fecha de entrega: 12 de noviembre.
+PROCESO:
+1)	Unir los canales en una sola base UNION ALL
+2) Definir:
+  - Incidencia
+  - Reincidencia
+  - Primera intención.
+#) Cruzar con Inventario
+#) Identificar qué bases serán las utilizadas además de las identificadas
+#) 
 
 
 
