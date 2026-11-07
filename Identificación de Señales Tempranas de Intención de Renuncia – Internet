@@ -6,8 +6,12 @@ Pendientes:
  - Cómo se vería la base final de analisis? Existen diferencias entre la base descriptiva y predictiva
  - Qué significa cerrar una incidencia sin resolver completamente el problema?
  - Tengo muchas intenciones de renuncia que finalmente no terminaron en renuncia, pero cuál es la intención de renuncia final? como identificarla. cuándo no logra se retenida?
- - 
+ - Averiguar qué tan fiel son las tablas de intenciones sandbox a la realidad.
 
+APUNTES:
+ - Dividir el analisis de los clientes que presentan más de una intención en Retenidos y no retenidos en la última retención
+ - Agregar un filtro al Dashboard por números de reincidencia en la Intención para analizar qué tipo de gestión tuvo el cliente que es reincidente
+ - 
 
 
 PROCESO:
@@ -21,7 +25,58 @@ PROCESO:
 #) 
 
 
+1)
+ 1.1) INBOUND columnas a utilizar:
+      - CANAL: INBOUND
+      - FECHA_CREACION: formato TIME
+      - ID_ORDEN_TRABAJO:
+      - ID_SERVICIO = SUBSCRIBER_ID
+      - CATEGORIZACION_OPERACIONAL_N1
+      - CATEGORIZACION_OPERACIONAL_N3
+      - CICLO_FINAL (Aun por ver si es igual en inventario)
+      - UBICACIONES_ATENCION
+      - CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
+      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
+      - FECHA_IMPACTO
 
+ 1.2) KIOSKO columnas a utilizar:
+      - CANAL: KIOSKO
+      - FECHA_INGRESO: Formato DATE
+      - ID_ORDEN_TRABAJO:
+      - SUBSCRIBER_ID
+      - CATEGORIZACION_OPERACIONAL_N1
+      - CATEGORIZACION_OPERACIONAL_N3
+      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
+      - CAC = UBICACIONES_ATENCION
+      - TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
+      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
+      - FECHA_IMPACTO: fecha de impacto de la baja
+
+1.3) INSTANTCALL columnas a utilizar:
+      - CANAL: No existe en este canal
+      - FECHA_CREACION = FECHA_INGRESO: Formato TIME
+      - ID_ORDEN_TRABAJO:
+      - ID_SERVICIO = SUBSCRIBER_ID
+      - CATEGORIZACION_OPERACIONAL_N1
+      - CATEGORIZACION_OPERACIONAL_N3
+      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
+      - UBICACIONES_ATENCION = CAC
+      - CATEGORIA_RESOLUCION_NIVEL_2F = TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
+      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
+      - FECHA_IMPACTO: fecha de impacto de la baja
+
+1.3) BARRA columnas a utilizar NO UTILIZAR PORQUE FECHA DESACTUALIZADA:
+      - CANAL: No existe en este canal
+      - FECHA = FECHA_CREACION = FECHA_INGRESO: Formato TIME
+      - ID_ORDEN_TRABAJO: no existe para este canal
+      - ID_SERVICIO = SUBSCRIBER_ID
+      - CATEGORIZACION_OPERACIONAL_N1
+      - CATEGORIZACION_OPERACIONAL_N3
+      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
+      - UBICACIONES_ATENCION = CAC
+      - CATEGORIA_RESOLUCION_NIVEL_2F = TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
+      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
+      - FECHA_IMPACTO: fecha de impacto de la baja
 
 
 
