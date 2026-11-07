@@ -1,15 +1,65 @@
-Resumen del chat de hoy
+Contexto general del proyecto
 
-La conversación con SAC Emilio Terán Calvo se centró en aterrizar el análisis descriptivo de señales tempranas de intención de renuncia de Internet, que debe presentarse el 12 de noviembre. El primer entregable será un resumen ejecutivo descriptivo, dejando el análisis predictivo para una etapa posterior. Debe contemplar intenciones totales y clientes únicos, tipologías, reincidencias y contactos previos al Call Center, reclamos y mantenimientos en ventanas de 90, 60 y 30 días, incorporando además variables descriptivas asociadas al SUBSCRIBER_ID.
+El trabajo se desarrolla dentro del negocio de Internet fijo, desde una perspectiva de retención y fidelización. El objetivo de fondo es estudiar el comportamiento de los clientes que manifiestan intención de renunciar o cancelar el servicio, buscando entender qué señales aparecen antes de una posible baja. En esta fase todavía no se está construyendo el modelo predictivo. El primer entregable es un análisis descriptivo con resumen ejecutivo, que debe presentarse el 12 de noviembre.
 
-Para construirlo, planteaste unificar las cuatro piscinas de intenciones por canal y cruzar cada intención con la tabla de inventario para incorporar características de los clientes. Ya validaste mediante query la existencia de clientes reincidentes, incluyendo casos con 8, 7, 5 y 4 intenciones, y discutieron que una reincidencia no necesariamente termina en baja: algunos clientes pueden registrar múltiples intenciones y continuar retenidos.
+La unidad clave para seguir al cliente es el SUBSCRIBER_ID. La idea es utilizarlo para reconstruir la trayectoria de cada suscripción a través de diferentes eventos: intenciones de renuncia, reincidencias, contactos con Call Center, reclamos, mantenimientos y, posteriormente, determinar si esa trayectoria terminó o no en una baja. Esto permite pasar de analizar eventos aislados a analizar el historial del cliente previo al churn/baja.
 
-También se discutieron dos enfoques. Uno consiste en analizar las reincidencias del período y separarlas entre retenidas y no retenidas. El otro consiste en partir desde la baja como punto final y reconstruir hacia atrás cuántas intenciones y contactos con Call Center tuvo previamente cada cliente. SAC Emilio Terán Calvo confirmó que esta segunda lógica representa una trazabilidad desde la baja hacia atrás. Sin embargo, identificaste correctamente que utilizar únicamente bajas excluiría a los clientes reincidentes que finalmente fueron retenidos.
+Qué debe contener el primer análisis
 
-La solución que quedó mejor encaminada es contemplar ambos escenarios mediante un filtro: clientes que terminaron en baja y clientes que no, manteniendo así el universo completo de intenciones y permitiendo analizar posteriormente cada comportamiento por separado. SAC Emilio Terán Calvo respondió favorablemente a este planteamiento.
+El requerimiento recibido establece dos grandes bloques. Primero, analizar intenciones de renuncia totales y clientes únicos, identificando las tipologías de intención y las reincidencias. Segundo, identificar los contactos con Call Center, reclamos y mantenimientos ocurridos 90, 60 y 30 días antes de la primera intención de renuncia. Todo esto debe enriquecerse con variables descriptivas del cliente asociadas a su SUBSCRIBER_ID.
 
-Además, propusiste medir el tiempo transcurrido entre intenciones y segmentarlo por rangos de días como posible indicador descriptivo de reincidencia. El período de observación todavía no está definido: utilizaste tres meses inicialmente para avanzar y planteaste simplificar el ejercicio tomando las bajas de octubre.
+Por lo tanto, conceptualmente el análisis busca reconstruir una secuencia similar a: comportamiento/experiencias previas del cliente → primera intención de renuncia → nuevas intenciones o reincidencias → resultado posterior del cliente, retenido o baja. Esta secuencia es una interpretación analítica de los elementos discutidos y no una regla formal definida todavía.
 
-Finalmente, respecto a las fuentes pendientes, SAC Emilio Terán Calvo indicó que los reclamos provienen de la misma tabla utilizada en el Gerencial y que él gestionará la información correspondiente a llamadas al Call Center.
+Construcción de la base analítica
 
-En una frase: hoy prácticamente quedó definido que el descriptivo debe estudiar el historial de intención de renuncia y reincidencia sin limitarse únicamente a quienes finalmente causaron baja, pero permitiendo identificar y comparar mediante filtros quién terminó en baja y quién permaneció retenido, y posteriormente incorporar sus contactos, reclamos y mantenimientos previos.
+Actualmente las intenciones no se encuentran necesariamente en una única fuente analítica. Por ello, el primer trabajo planteado es fusionar las cuatro piscinas de intenciones correspondientes a los distintos canales en una sola piscina consolidada. Posteriormente, cada intención debe cruzarse con la tabla de inventario para incorporar las características disponibles del cliente o servicio.
+
+La lógica ya comenzó a validarse mediante queries. Por ejemplo, en Kiosko Internet ya se identificaron SUBSCRIBER_ID reincidentes, incluyendo clientes con 8, 7, 5 y 4 intenciones registradas dentro del período observado. Incluso se discutió el caso conceptual de un cliente que se presenta diez veces a un CAC durante aproximadamente tres meses como ejemplo para entender qué debe considerarse reincidencia.
+
+Esto vuelve relevante distinguir dos métricas: número total de intenciones y número de clientes únicos con intención. Un mismo cliente puede generar múltiples intenciones, por lo que contar solamente registros no refleja necesariamente cuántos clientes están involucrados ni la intensidad de reincidencia de cada uno.
+
+El punto conceptual más importante discutido hoy
+
+Inicialmente se consideró tomar un período determinado, contar las reincidencias y clasificarlas dependiendo de si terminaron RETENIDAS o NO RETENIDAS.
+
+Después surgió otra lógica: partir desde las bajas confirmadas y reconstruir el comportamiento hacia atrás. Bajo este enfoque se podría tomar, por ejemplo, una baja de octubre, determinar cuántas intenciones de renuncia tuvo previamente ese SUBSCRIBER_ID y después retroceder todavía más para identificar cuántos contactos con Call Center, reclamos o mantenimientos tuvo antes de llegar a esas intenciones. SAC Emilio Terán Calvo confirmó que esta lógica equivale a estudiar la trazabilidad desde la baja, como punto final, hacia atrás.
+
+Sin embargo, se identificó un problema metodológico importante: no todos los clientes reincidentes terminan en baja. Algunos pueden presentar múltiples intenciones y ser retenidos en todos sus contactos. Si el universo del análisis se construye exclusivamente partiendo de las bajas, dichos clientes desaparecerían del análisis, aun cuando su comportamiento de reincidencia resulta relevante para el requerimiento original.
+
+Enfoque que quedó mejor encaminado
+
+La conversación evolucionó hacia conservar inicialmente todo el universo de intenciones, sin restringirlo solamente a clientes dados de baja. Posteriormente se puede incorporar una clasificación o filtro que permita separar:
+
+clientes que finalmente terminaron en baja frente a clientes que no terminaron en baja.
+
+De esta manera es posible estudiar tanto el camino que efectivamente culminó en churn como aquellos casos en los que existieron señales de renuncia y reincidencia, pero la empresa consiguió mantener al cliente. Esta propuesta fue planteada explícitamente en el chat y tuvo una respuesta favorable de SAC Emilio Terán Calvo.
+
+Desde el punto de vista de negocio, esta distinción es fundamental porque una intención de renuncia no equivale automáticamente a una baja. La intención representa una señal dentro del recorrido del cliente; posteriormente puede existir retención, nuevas intenciones o finalmente una baja.
+
+Reincidencia como posible señal temprana
+
+La reincidencia está tomando especial relevancia dentro del descriptivo. No interesa únicamente saber cuántos clientes manifiestan intención, sino también cuántas veces vuelve cada cliente a manifestarla y con qué frecuencia temporal.
+
+Durante la conversación se planteó calcular el tiempo transcurrido entre una intención y la siguiente y posteriormente segmentarlo mediante rangos de días.
+
+Esto podría permitir que el descriptivo responda preguntas de negocio como: ¿qué proporción de clientes tiene una sola intención frente a múltiples intenciones?, ¿cuántas intenciones acumulan los reincidentes?, ¿qué tipologías concentran mayor reincidencia?, ¿qué tan rápido vuelve un cliente después de su primera intención?, ¿el comportamiento es diferente entre quienes finalmente causan baja y quienes permanecen retenidos? Estas preguntas son derivaciones analíticas razonables del objetivo y no requerimientos explícitos ya acordados.
+
+Ventana temporal
+
+La ventana definitiva del análisis todavía no está cerrada. Para avanzar se utilizó provisionalmente un período aproximado de tres meses, pero se reconoce explícitamente que debe definirse correctamente. También se planteó utilizar inicialmente las bajas de octubre para simplificar la construcción y validar la lógica.
+
+Esto debe diferenciarse de las ventanas que sí forman parte del requerimiento: para los eventos anteriores a la primera intención se solicitan observaciones en 90, 60 y 30 días previos.
+
+Fuentes que todavía deben incorporarse
+
+La piscina consolidada de intenciones constituye el núcleo inicial del análisis. Para los reclamos, SAC Emilio Terán Calvo indicó que se utiliza la misma tabla que alimenta el Gerencial. Para las llamadas al Call Center, indicó que gestionará la obtención de la fuente correspondiente.
+
+Por tanto, todavía no está completa toda la capa de información requerida para reconstruir el comportamiento previo. El análisis puede avanzar primero con intenciones, inventario y reincidencias mientras se incorporan posteriormente contactos, reclamos y mantenimientos.
+
+Definición práctica del análisis a construir
+
+En términos simples, la otra IA debería entender la tarea de esta manera:
+
+Construir una vista analítica a nivel SUBSCRIBER_ID del cliente de Internet fijo que permita estudiar todas las intenciones de renuncia registradas en los diferentes canales, consolidándolas en una sola fuente; distinguir clientes únicos de eventos totales; identificar tipologías y niveles de reincidencia; medir potencialmente el tiempo entre intenciones; enriquecer cada cliente con información descriptiva proveniente del inventario; incorporar sus contactos con Call Center, reclamos y mantenimientos durante los 90, 60 y 30 días anteriores a su primera intención; y finalmente diferenciar mediante una clasificación o filtro a los clientes que terminaron en baja de aquellos que permanecieron retenidos. El propósito inicial es producir un análisis descriptivo y un resumen ejecutivo que permita identificar patrones y posibles señales tempranas asociadas con la intención de renuncia. El desarrollo predictivo es una etapa posterior.
+
+El punto metodológico que no debe perderse al continuar el trabajo es que la baja no debería utilizarse como único criterio de entrada al universo analítico, porque hacerlo eliminaría precisamente una parte importante del comportamiento que se quiere estudiar: clientes que presentan una o varias intenciones de renuncia, pero terminan siendo retenidos
