@@ -1,11 +1,123 @@
-De acuerdo con los lineamientos no procede. El documento presentado corresponde a una carta de autorización. El documento a presentar es un poder general o especial (NOTARIAL) que contenga una cláusula de acuerdo con lo que se redactó en el documento. Considerar los siguientes escenarios.
- 	 	 	 	 	 	 	 
-Poder apostillado	 	 	 	 	 	 
-1. Es un poder general o especial emitido en una Notaría extranjera.	 	 
-2. Se realiza la misma verificación del contenido y vigencia (incluyendo pedir la fe de no revocatoria).
-3. Viene grapado a una hoja que dice APOSTILLA. En esta hoja constan los datos del documento que se está avalando, por lo que debe coincidir los datos de fecha de emisión y de persona que firma el poder.
-4. Sin apostilla, el poder extranjero emitido en Notaría NO se puede usar en Ecuador,
-Poder en consulado	 	 	 	 	 	 
-1. Es un poder general o especial emitido en un CONSULADO ecuatoriano en el extranjero.
-2. Se realiza la misma verificación del contenido y vigencia (incluyendo pedir la fe de no revocatoria).
-3. No se realiza en Notaría y NO es una escritura pública. NO lleva apostilla.
+Contexto integral del proyecto
+
+Este análisis busca comprender, dentro del negocio de telecomunicaciones de Internet fijo, qué comportamientos, eventos operativos y cambios en la experiencia del cliente aparecen antes de que este solicite cancelar el servicio. El concepto de “señal temprana” se refiere a cualquier dato observable que permita detectar un deterioro de la relación con el cliente antes de que exista una intención formal de renuncia, una programación de baja o una desconexión efectiva.
+
+Giro del negocio y naturaleza del servicio
+
+El negocio de Internet fijo se basa en mantener clientes conectados mediante servicios residenciales soportados principalmente sobre tecnologías HFC o GPON. A diferencia de una venta puntual, este es un negocio de ingresos recurrentes: el cliente paga mensualmente mientras el servicio permanece activo. Por esta razón, el valor económico de un cliente no depende solamente de la instalación inicial, sino de su permanencia, antigüedad, pago recurrente, contratación de productos adicionales y posible relación convergente con otros servicios móviles o del hogar.
+
+La experiencia del cliente se construye durante todo el ciclo de vida. Comienza con la venta, continúa con la instalación y activación, y se mantiene mediante la calidad de la conexión, la estabilidad del servicio, la facturación, la atención de reclamos, el soporte técnico, las visitas domiciliarias y la gestión de retención. Una deficiencia en cualquiera de estos puntos puede incrementar la insatisfacción, pero normalmente la renuncia no se produce por un único evento aislado. Con frecuencia es el resultado acumulado de fallas, contactos repetidos, promesas incumplidas, transferencias entre áreas y ausencia de una solución definitiva.
+
+En este tipo de negocio existen diferentes momentos que no deben tratarse como equivalentes. Una molestia es una señal de insatisfacción; un reclamo es una manifestación formal sobre un problema; una intención de renuncia es la expresión explícita del deseo de cancelar; una programación de baja es el registro operativo para ejecutar la cancelación; y una baja efectiva es la inactivación definitiva del servicio. Entre estos eventos pueden existir gestiones de soporte, soluciones técnicas, ofertas económicas, contactos de retención o desistimientos del cliente.
+
+Entorno operativo de la renuncia
+
+Cuando un cliente de Internet Hogar manifiesta que desea cancelar, los procedimientos internos contemplan identificar el motivo, registrar la intención en Remedy, validar trámites y problemas pendientes, ofrecer alternativas y transferir o asignar el caso a Retención. La categorización incluye motivos como cambio de proveedor, cambio de tecnología, falla en el servicio, mala atención, viaje u otros. Dependiendo del canal y de la disponibilidad del cliente, la gestión puede continuar mediante Retención Hogar inbound o una bandeja outbound para contacto posterior.
+
+La intención puede originarse en distintos puntos de contacto: Call Center, soporte técnico, WhatsApp, redes sociales, CAC, kioscos, back offices o áreas de traslado. Esto significa que la visión del cliente está distribuida entre sistemas, canales y equipos. El mismo problema puede aparecer como llamada, incidencia, ticket, reclamo, visita técnica y finalmente intención de renuncia. Si esas fuentes se observan por separado, puede parecer que son eventos independientes; al unirlas por cliente, servicio y tiempo, puede revelarse una secuencia continua de deterioro.
+
+Retención funciona como una instancia que intenta evitar la salida mediante escucha, solución, orientación, beneficios o coordinación técnica. Sin embargo, cuando el cliente llega a esta etapa después de múltiples experiencias negativas, la capacidad de negociación puede ser limitada. En uno de los casos internos analizados, una cliente presentó cuatro incidencias de soporte previas, afectación recurrente y una alta dependencia del servicio; al no cumplirse sus expectativas de solución, mantuvo su decisión de cancelar. En contraste, otro cliente con tres incidencias previas aceptó continuar después de una oferta de retención y una visita técnica. La comparación evidencia que el número de incidencias es relevante, pero no explica por sí solo el resultado; también importa si el problema fue resuelto, cuánto demoró la solución, qué expectativa tenía el cliente y en qué momento intervino Retención.
+
+Dimensión real del problema
+
+En septiembre de 2026 se registraron 2.972 bajas voluntarias de Internet. El 74,1% se concentró en cuatro motivos: novedades con el servicio, viaje, mala venta y problemas económicos. Novedades con el servicio representó 669 bajas, equivalentes al 22,5%; viaje alcanzó 641, equivalentes al 21,6%; mala venta registró 485, equivalentes al 16,3%; y problemas económicos sumó 408, equivalentes al 13,7%. Servicio y mala venta representaron conjuntamente el 38,8% de las bajas, una concentración importante porque ambas categorías incluyen causas sobre las cuales la empresa puede tener capacidad de intervención.
+
+Al 25 de octubre se registraban 2.503 bajas voluntarias, 120 menos que en septiembre. Los cuatro motivos principales concentraban el 75,6% de las bajas; viaje representaba 632 casos y novedades con el servicio 569. Servicio y mala venta acumulaban 958 casos, equivalentes al 38,3%. En la revisión interna también se planteó auditar entre 150 y 200 interacciones clasificadas como viaje mediante speech analytics, debido a que esta categoría podría estar absorbiendo situaciones cuya causa real sea servicio, precio, mala atención u otra molestia no identificada correctamente.
+
+El cierre de octubre relacionó el incremento de bajas con un crecimiento de intenciones y programaciones, mayor carga en Segunda Línea, más casos no gestionables, bajas en línea superiores a lo previsto y una efectividad de rescate inferior a la meta. Internet registró 271 bajas adicionales frente al periodo comparado, y la incorporación de 254 casos de mala venta elevó el total hasta 3.369 bajas y el churn desde 0,69% hasta 0,74%. Esto demuestra que el resultado final no depende exclusivamente de la cantidad de clientes inconformes, sino también de la capacidad operativa para recibir, clasificar, contactar, solucionar y retener esos casos.
+
+Churn, intención y permanencia
+
+El churn representa la pérdida de clientes o servicios durante un periodo en relación con la base activa. En Internet fijo, una baja impacta los ingresos recurrentes y puede afectar la rentabilidad de la inversión realizada en venta, instalación, equipos, infraestructura, soporte y mantenimiento. No obstante, una intención de renuncia no siempre termina en churn, porque el cliente puede ser retenido, desistir o aceptar una solución. Del mismo modo, no todas las bajas tienen el mismo grado de prevención: algunas dependen de circunstancias externas, mientras que otras se relacionan directamente con la experiencia proporcionada por la empresa.
+
+Por ello, deben diferenciarse las causas aparentemente externas de las causas gestionables. Viaje, traslado fuera de cobertura o problemas económicos pueden parecer menos controlables, pero incluso en esos casos puede existir una causa subyacente diferente, una alternativa comercial o una categorización incorrecta. Novedades con el servicio, mala venta, visitas incumplidas, facturación inconsistente y mala atención son más directamente vinculables con procesos internos y, por tanto, tienen mayor potencial para generar señales accionables.
+
+También debe distinguirse entre cliente y servicio. Un cliente puede tener más de un servicio fijo, varios productos o una relación convergente. Puede cancelar una línea y mantener otra, o cancelar Internet y continuar con móvil. En el análisis interno de convergencia se considera que existe una baja convergente cuando el cliente deja uno de los servicios, aunque permanezca con Claro en otro, porque deja de cumplir la condición de cliente convergente.
+
+Convergencia y riesgo de renuncia
+
+La convergencia vincula servicios móviles y del hogar mediante ofertas, precios o beneficios complementarios. Su relevancia para el análisis radica en que un cliente puede permanecer no solo por estar satisfecho con Internet, sino porque el conjunto de servicios le ofrece un valor que no encuentra por separado. En reuniones internas se señaló que el menor churn observado en determinados clientes convergentes podría relacionarse con la negociación del asesor, la satisfacción conjunta con los servicios y el precio de la oferta.
+
+Romper la convergencia puede ocasionar la pérdida automática de beneficios. Se mencionaron ventajas como gigas adicionales o incrementos de velocidad entregados a clientes que mantienen móvil e Internet. También se identificó el riesgo de que algunos clientes no conozcan esos beneficios debido a una comunicación insuficiente. Por tanto, una intención de cancelar uno de los servicios puede estar relacionada con una percepción incompleta del valor total que recibe el cliente.
+
+Esto introduce variables adicionales: cantidad de servicios contratados, condición convergente, beneficios activos, nivel de conocimiento del beneficio, pérdida potencial al cancelar, facturación conjunta o separada y antigüedad de la relación convergente. La ruptura de convergencia también puede funcionar como un evento de alerta para el servicio restante, porque un cliente que ya canceló un producto podría tener mayor propensión a cancelar posteriormente otro.
+
+Qué es una señal temprana
+
+Una señal temprana no es necesariamente una frase explícita como “quiero cancelar”. Puede ser una combinación de eventos que indique que la experiencia está empeorando. Por ejemplo, una primera falla aislada y solucionada puede tener poco poder predictivo, pero una segunda incidencia por el mismo motivo dentro de 30 días, seguida de una visita incumplida y un nuevo contacto, puede representar un cambio sustancial en el riesgo.
+
+Las señales pueden agruparse en técnicas, operativas, comerciales, económicas, relacionales y conductuales. Las señales técnicas incluyen interrupciones, intermitencia, lentitud, degradación, incidencias repetidas, fallas masivas, mantenimientos, problemas de módem, cableado, nodo u OLT y visitas técnicas reiteradas. Las operativas comprenden tiempos prolongados de solución, solicitudes cerradas sin resolver, reaperturas, transferencias, falta de contacto, promesas incumplidas y trámites pendientes. Las comerciales incluyen mala venta, diferencias entre lo ofrecido y lo instalado, desconocimiento de condiciones y percepción de poco valor. Las económicas incluyen deuda, mora, incrementos, descuentos vencidos e inconformidad con la factura. Las relacionales incluyen trato deficiente, repetición de información y ausencia de responsabilidad de punta a punta. Las conductuales consideran aumento de contactos, cambio de canal, solicitud de valores de cancelación, consulta de permanencia o retiro de equipos.
+
+La evidencia interna sobre clientes con primer incidente mostró que las intenciones posteriores fueron bajas entre los casos gestionados y se concentraron principalmente en clientes no contactados. También se identificó a los clientes con intención y reclamo reincidente como el principal foco de riesgo. Esto sugiere que la ausencia de contacto efectivo y la repetición del problema contienen información predictiva distinta: la primera refleja una brecha de gestión y la segunda una falla de resolución.
+
+Importancia de la temporalidad
+
+La misma variable puede tener interpretaciones diferentes dependiendo del momento. Tres reclamos durante dos años no representan necesariamente el mismo riesgo que tres reclamos durante los últimos 15 días. Por ello, el análisis requiere ventanas temporales que permitan medir intensidad y proximidad: contactos en 7, 15, 30, 60 o 90 días; días desde el último reclamo; tiempo entre incidencias; duración del problema; y cantidad de eventos posteriores a un supuesto cierre.
+
+La secuencia también aporta significado. “Incidencia, solución y ausencia de nuevos contactos” representa una experiencia distinta de “incidencia, cierre, reapertura, visita incumplida, nuevo reclamo e intención”. Aunque ambas secuencias contengan eventos similares, su orden permite identificar acumulación de frustración y ausencia de resolución definitiva. Por eso, además de contar eventos, es necesario observar qué ocurrió primero, cuánto tiempo transcurrió y qué resultado tuvo cada intervención.
+
+El segundo o tercer contacto puede actuar como punto de inflexión. El primero informa sobre un problema; el segundo puede indicar que la solución no funcionó; el tercero puede representar pérdida de confianza. Sin embargo, ese efecto debe observarse por motivo, tecnología y resultado. Tres consultas informativas no equivalen a tres reportes de indisponibilidad, y una visita cumplida con solución definitiva no equivale a una visita fallida.
+
+Unidad de análisis y estructura de información
+
+La unidad operativa más adecuada es el servicio de Internet identificado por su código de servicio, relacionado con el cliente titular. Esto evita confundir a una persona que posee varios servicios con una sola conexión. La dimensión cliente permite reconocer relaciones múltiples, mientras que la dimensión servicio conserva la trazabilidad técnica y comercial de cada acceso.
+
+Cada registro analítico debe ubicarse en una fecha determinada para reconstruir qué información estaba disponible antes de la intención. Esto es esencial porque un dato conocido después de la renuncia puede explicar lo ocurrido, pero no sirve como señal verdaderamente anticipada. Por ejemplo, el motivo final de baja puede utilizarse para analizar resultados, pero no para estimar el riesgo antes de que el cliente declare su intención.
+
+Las fuentes relevantes comprenden inventario de clientes, intenciones registradas en Remedy, contactos de Call Center, incidencias, reclamos, visitas técnicas, mantenimientos, facturación, pagos, mora, campañas, ofertas, retenciones, información geográfica y atributos del servicio. La trazabilidad entre estas fuentes exige llaves consistentes como SERVICIO, identificación del cliente, número de cuenta, ticket, orden de trabajo y fecha del evento.
+
+Variables explicativas del comportamiento
+
+La antigüedad puede reflejar estabilidad o desgaste. Un cliente nuevo podría renunciar por una instalación deficiente, mala venta o incumplimiento temprano de la promesa comercial. Un cliente antiguo podría presentar mayor permanencia por hábito y confianza, pero también mayor sensibilidad cuando percibe que sus problemas no son reconocidos después de años de relación.
+
+La tecnología HFC o GPON puede influir por sus características operativas. El tipo de red, zona, nodo, OLT, capacidad y mantenimientos pueden generar patrones territoriales de afectación. Si varias intenciones se concentran en la misma infraestructura y periodo, el problema puede ser colectivo y no exclusivamente individual.
+
+El canal de venta permite analizar mala venta, expectativas y calidad de la oferta original. El canal de atención ayuda a identificar si ciertos recorridos producen más transferencias, menor resolución o mayor reincidencia. La zona geográfica puede revelar falta de cobertura, calidad técnica, disponibilidad de visitas o concentración de incidentes. El plan, velocidad, precio, descuento y beneficios permiten medir la relación entre valor percibido y riesgo.
+
+También son relevantes la cantidad de contactos, número de motivos distintos, repetición del mismo motivo, duración acumulada de indisponibilidad, visitas programadas y cumplidas, tiempo de resolución, reaperturas, contacto efectivo, estado de la gestión, resultado de retención y antecedentes de intenciones previas. La combinación de estas variables permite distinguir entre un cliente con un evento ocasional y otro atrapado en un ciclo de reclamos.
+
+Motivos de renuncia y calidad de la tipificación
+
+El motivo registrado no siempre representa la causa profunda. “Viaje” puede ser la explicación declarada, una categoría utilizada por facilidad o una forma de cerrar una interacción sin profundizar. Del mismo modo, “problemas económicos” puede ocultar una inconformidad con el valor recibido, mientras que “cambio de proveedor” puede estar precedido por fallas, mala atención o una oferta competitiva.
+
+La diferencia entre motivo declarado y causa raíz es fundamental. El motivo declarado describe lo que se registró en el momento de la renuncia; la causa raíz intenta explicar qué deterioró la relación. Para encontrarla se requiere observar el historial previo, el contenido de las conversaciones, las incidencias, las soluciones y la evolución temporal. La auditoría mediante speech analytics puede ayudar a contrastar la categorización con las palabras reales del cliente. La recomendación interna de revisar entre 150 y 200 interacciones clasificadas como viaje responde precisamente a esta necesidad.
+
+Retención y capacidad real de intervención
+
+La retención no debe interpretarse únicamente como la aceptación de un descuento. En casos relacionados con servicio, la intervención puede necesitar una solución técnica, una visita, corrección de facturación, explicación de beneficios o seguimiento. Una oferta económica puede lograr una permanencia temporal sin reparar la causa original; si el problema continúa, el cliente puede reincidir.
+
+La efectividad tampoco debería observarse solo como cantidad de clientes retenidos durante la primera interacción. Es necesario diferenciar retención inmediata, permanencia posterior y reincidencia. Un cliente puede aceptar continuar y volver a solicitar la baja pocos días después. En ese caso, la gestión fue exitosa en el corto plazo, pero no necesariamente resolvió el riesgo.
+
+Los estados de gestión también aportan información. Un cliente retenido, un cliente no contactado, un contacto no efectivo y un caso no gestionable representan resultados operativos diferentes. La documentación interna muestra que el crecimiento de la carga en Segunda Línea y el aumento de casos no gestionables coincidieron con una menor efectividad de rescate, lo que conecta la capacidad operativa con el resultado de churn.
+
+Interpretación predictiva
+
+La predicción consiste en estimar la probabilidad de que un cliente presente una intención dentro de una ventana futura, utilizando únicamente información disponible antes del evento. La variable objetivo puede representar primera intención, reincidencia, baja efectiva o ruptura de convergencia, pero estos resultados deben mantenerse separados porque responden a procesos distintos.
+
+Un cliente con alta probabilidad de intención no necesariamente cancelará. Puede recibir una intervención efectiva o resolver espontáneamente su problema. De igual forma, un cliente clasificado con bajo riesgo puede renunciar debido a un evento repentino que no estaba presente en el historial. Por eso, una probabilidad no debe entenderse como certeza, sino como una estimación comparativa que permite identificar grupos con mayor concentración esperada de casos.
+
+Las variables predictivas deberían conservar interpretación empresarial. Saber que un cliente tiene alto riesgo es insuficiente si no se puede explicar si el riesgo proviene de fallas recurrentes, ausencia de contacto, mala venta, facturación, mora o pérdida de beneficios. La explicabilidad permite conectar la señal con el proceso responsable y distinguir causas tratables de circunstancias externas.
+
+Diferencias entre análisis descriptivo, alertas y modelo
+
+El análisis descriptivo explica qué ocurrió en la historia: cuántas intenciones existieron, qué motivos tuvieron y qué eventos las precedieron. Una regla de alerta identifica combinaciones concretas, por ejemplo, dos incidencias en 30 días más una visita incumplida. Un modelo predictivo combina múltiples variables y estima una probabilidad individual.
+
+Las reglas suelen ser más fáciles de interpretar, pero pueden perder casos que no encajan exactamente en un patrón. Los modelos pueden captar interacciones más complejas, pero requieren datos suficientes, estabilidad y controles para evitar conclusiones engañosas. Ambos enfoques pueden coexistir: las reglas representan señales operacionalmente claras y el modelo ordena a los clientes según riesgo relativo.
+
+Riesgos de interpretación
+
+El principal riesgo metodológico es utilizar información posterior a la intención para predecirla. Esto produciría resultados artificialmente altos sin utilidad real. Otro riesgo es confundir correlación con causalidad: que los clientes con más contactos renuncien con mayor frecuencia no significa que contactar cause la renuncia; normalmente el aumento de contactos refleja un problema previo no resuelto.
+
+También existe sesgo de registro. Los clientes que usan canales formales generan más datos que quienes dejan de usar el servicio o cancelan sin reclamar. La ausencia de contactos no siempre significa satisfacción. Puede representar desinterés, cansancio o preferencia por otro proveedor. Además, diferencias entre canales, asesores y sistemas pueden alterar la calidad de la categorización.
+
+La duplicidad es otro riesgo relevante. Un único problema puede producir varios tickets, interacciones o registros, inflando la frecuencia si no se relacionan correctamente. En sentido contrario, distintas molestias pueden concentrarse bajo una misma categoría genérica, ocultando la complejidad real. La calidad de la identificación del cliente, del servicio y de las fechas determina la confiabilidad de cualquier conclusión.
+
+Significado empresarial del resultado
+
+La utilidad del análisis reside en convertir la historia operativa del cliente en información anticipada. En lugar de intervenir únicamente cuando la persona ya solicita cancelar, la empresa puede comprender qué deterioros preceden con mayor frecuencia esa decisión, qué grupos concentran riesgo y cuánto tiempo existe entre la primera señal y la intención.
+
+Desde la perspectiva del negocio, esto conecta experiencia, operación, servicio técnico, ventas, facturación, retención y churn. Las bajas dejan de observarse solamente como una cifra de cierre y pasan a entenderse como el resultado de una trayectoria. Esa trayectoria incluye lo que se vendió, lo que se instaló, la calidad recibida, los problemas presentados, las respuestas entregadas y la percepción final de valor.
+
+Los antecedentes revisados muestran que una proporción relevante de las bajas se concentra en causas vinculadas con servicio y mala venta; que la reincidencia y la falta de contacto constituyen señales importantes; que la resolución efectiva puede cambiar el desenlace incluso cuando existen incidencias previas; y que la capacidad de Retención está condicionada por el momento en que recibe al cliente.
+
+En síntesis, la “Identificación de Señales Tempranas de Intención de Renuncia – Internet” es un análisis del ciclo de deterioro previo a la cancelación en clientes de Internet Hogar. Su objeto de estudio no es solamente quién renuncia, sino qué ocurrió antes, qué señales estaban disponibles, cuáles tuvieron verdadera capacidad predictiva, qué parte del riesgo se relaciona con procesos internos y qué diferencia a un cliente que finalmente cancela de otro que permanece después de recibir una solución.
