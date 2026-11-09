@@ -150,35 +150,12 @@ FROM(
 
 WHERE INTENCIONES.FECHA_INTENCION >= '2026-10-01'
 AND INTENCIONES.FECHA_INTENCION < '2026-11-01'
---GROUP BY INTENCIONES.CANAL
-LIMIT 1000
 ;
-
---################# CRUCE CON TABLERO INFORME GERENCIAL BAJAS
-SELECT *
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
-LIMIT 1000
-;
-
-
---################ CRUCE CON TABLERO INVENTARIO
-
-
 
 
 /*###############################################################################################################################################################
 #####################################################            INFORME GERENCIAL            #####################################################################
 ############################################################################################################################################################### */
-
-SELECT 
-FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL, COUNT(*)  
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
-WHERE GRUPO_ORIGEN = 'BAJAS'
-AND TIPO_BAJA = 'VOLUNTARIA'
-AND ID_IDENTIFICACION IN ('CARNE DE REFUGIADO','CED','CEDULA','CR','PAS','PASAPORTE','RC')
-AND FECHA_PROCESO = '202610'
-GROUP BY FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL
-;
 
 SELECT
 SUBSCRIBER_ID,
