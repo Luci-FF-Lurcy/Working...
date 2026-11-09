@@ -1,6 +1,7 @@
 
 /*######################################################################
-  CRUCE BAJAS OCTUBRE VS INTENCIONES PREVIAS
+  CRUCE BAJAS OCTUBRE 2026 VS INTENCIONES SEPTIEMBRE 2026
+  OBJETIVO: IDENTIFICAR INTENCIONES PREVIAS A CADA BAJA
 ######################################################################*/
 
 WITH INTENCIONES_GLOBAL AS (
@@ -85,14 +86,16 @@ WITH INTENCIONES_GLOBAL AS (
 
         WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO'
 
-    ) INTENCIONES
+    ) AS INTENCIONES
+
+    /* INTENCIONES REGISTRADAS EN SEPTIEMBRE */
 
     WHERE INTENCIONES.FECHA_INTENCION >= DATE '2026-09-01'
       AND INTENCIONES.FECHA_INTENCION < DATE '2026-10-01'
 ),
 
 /*--------------------------------------------------------------------
-  BAJAS VOLUNTARIAS DE OCTUBRE
+  BASE DE BAJAS - INFORME GERENCIAL
 --------------------------------------------------------------------*/
 
 BAJAS_OCTUBRE AS (
@@ -100,41 +103,51 @@ BAJAS_OCTUBRE AS (
     SELECT
         SUBSCRIBER_ID,
         DATE(FECHA_BAJA) AS FECHA_BAJA,
-        FAMILIA AS FAMILIA_BAJA,
-        SUBCLASIFICACION_INFORME_GERENCIAL AS MOTIVO_BAJA,
-        FECHA_PROCESO AS CORTE_BAJA
+        FAMILIA,
+        GRUPO_ORIGEN,
+        TIPO_BAJA,
+        SUBCLASIFICACION_INFORME_GERENCIAL,
+        ID_IDENTIFICACION,
+
+        CASE
+            WHEN ID_IDENTIFICACION IN (
+                'CARNE DE REFUGIADO',
+                'CED',
+                'CEDULA',
+                'CR',
+                'PAS',
+                'PASAPORTE',
+                'RC'
+            )
+            THEN 'MASIVO'
+            ELSE ID_IDENTIFICACION
+        END AS SEGMENTO
 
     FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
 
     WHERE GRUPO_ORIGEN = 'BAJAS'
       AND TIPO_BAJA = 'VOLUNTARIA'
-
-      AND ID_IDENTIFICACION IN (
-          'CARNE DE REFUGIADO',
-          'CED',
-          'CEDULA',
-          'CR',
-          'PAS',
-          'PASAPORTE',
-          'RC'
-      )
-
       AND FECHA_PROCESO = '202610'
-
-      AND FECHA_BAJA >= DATE '2026-10-01'
-      AND FECHA_BAJA < DATE '2026-11-01'
 )
 
 /*--------------------------------------------------------------------
-  LEFT JOIN CLASICO
+  CRUCE FINAL - LEFT JOIN CLASICO
 --------------------------------------------------------------------*/
 
 SELECT
+
+    /* DATOS DE LA BAJA */
+
     B.SUBSCRIBER_ID,
     B.FECHA_BAJA,
-    B.FAMILIA_BAJA,
-    B.MOTIVO_BAJA,
-    B.CORTE_BAJA,
+    B.FAMILIA,
+    B.GRUPO_ORIGEN,
+    B.TIPO_BAJA,
+    B.SUBCLASIFICACION_INFORME_GERENCIAL,
+    B.ID_IDENTIFICACION,
+    B.SEGMENTO,
+
+    /* DATOS DE LA INTENCION */
 
     I.LINEA,
     I.CANAL,
@@ -147,6 +160,8 @@ SELECT
     I.HERRAMIENTA_RETENCION,
     I.FECHA_IMPACTO,
     I.RNR,
+
+    /* INDICADOR DE EXISTENCIA DE INTENCION */
 
     CASE
         WHEN I.SUBSCRIBER_ID IS NOT NULL THEN 1
