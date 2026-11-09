@@ -1,17 +1,135 @@
-SELECT
-    TIPO_BAJA,
-    COUNT(*) AS TOTAL_REGISTROS,
-    COUNT(DISTINCT SUBSCRIBER_ID) AS SERVICIOS_UNICOS,
-    COUNT(DISTINCT IDENTIFICACION) AS CLIENTES_UNICOS,
-    MIN(DATE(FECHA_BAJA)) AS PRIMERA_BAJA,
-    MAX(DATE(FECHA_BAJA)) AS ULTIMA_BAJA
+La captura corresponde a una hoja de trabajo de Tableau Desktop del libro “INFORME GERENCIAL”. La hoja activa se denomina aproximadamente “INFORME GERENCIAL DETALLE…” y presenta una tabla cruzada titulada “Motivos Bajas Voluntaria”, orientada a analizar mensualmente el volumen y la participación porcentual de los motivos asociados a bajas voluntarias de servicios fijos.
 
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
+Objetivo de la visualización
 
-WHERE FAMILIA = 'Internet'
-  AND FECHA_BAJA IS NOT NULL
-  AND FECHA_BAJA >= DATE '2026-10-01'
-  AND FECHA_BAJA < DATE '2026-11-09'
+La tabla permite comparar cómo se distribuyen las bajas voluntarias por motivo gerencial y clasificación específica, mostrando para cada mes dos medidas:
 
-GROUP BY TIPO_BAJA
-ORDER BY TIPO_BAJA;
+Cantidad de bajas voluntarias, representada por AGG(BAJAS VOLUNTARIAS (copia)).
+Participación porcentual del motivo dentro del total mensual, representada por Cálculo11, configurado como cálculo de tabla.
+
+Por ejemplo, para octubre de 2026 se observan 732 casos de Viaje, equivalentes al 21,73 % del total mensual. Esto significa que cada porcentaje debe interpretarse verticalmente dentro de su respectivo mes, no como variación respecto al mes anterior.
+
+Estructura de la tabla
+
+En el estante de Columnas aparecen:
+
+MES(Fecha): organiza la información cronológicamente.
+Nombres de medidas: genera dos columnas por cada mes, una para el volumen y otra para el porcentaje.
+
+En el estante de Filas aparecen:
+
+Informe Gerencial2: agrupación general del motivo de baja.
+Clasificacion IG: detalle o submotivo asociado a cada agrupación general.
+
+La tabla visible muestra tres meses: agosto de 2026, septiembre de 2026 y octubre de 2026. Existe una barra de desplazamiento vertical dentro de la vista, por lo que pueden existir más filas o categorías fuera del área visible. El filtro mensual indica que enero a octubre de 2026 están seleccionados y noviembre está desmarcado, por lo que la visualización completa contiene más meses de los que caben simultáneamente en pantalla.
+
+Jerarquía de motivos mostrada
+
+La primera columna agrupa los motivos de manera gerencial y la segunda los desglosa en clasificaciones específicas:
+
+Baja en línea
+Renuncia Forzosa.
+Cambio de proveedor
+Cambio de Proveedor.
+Mala Venta
+MAC.
+Otras Malas Ventas.
+SDA.
+Novedades con el servicio
+Niveles de Potencia.
+Mantenimiento.
+Reclamos.
+Clientes Silenciosos.
+Otras Bajas
+Otras Bajas.
+Corto Tiempo de Vida.
+Problemas Económicos
+Problemas Económicos.
+Traslado fuera de cobertura
+Traslado Fuera de Cobertura.
+Viaje
+Viaje.
+
+Las líneas horizontales azules separan visualmente cada agrupación principal de Informe Gerencial2.
+
+Valores visibles
+Motivo general	Clasificación	Ago-26	Sept-26	Oct-26
+Baja en línea	Renuncia Forzosa	80, 2,77 %	78, 2,74 %	77, 2,29 %
+Cambio de proveedor	Cambio de Proveedor	193, 6,69 %	153, 5,38 %	164, 4,87 %
+Mala Venta	MAC	37, 1,28 %	40, 1,41 %	308, 9,14 %
+Mala Venta	Otras Malas Ventas	176, 6,10 %	180, 6,33 %	148, 4,39 %
+Mala Venta	SDA	264, 9,15 %	259, 9,11 %	306, 9,08 %
+Novedades con el servicio	Niveles de Potencia	106, 3,67 %	71, 2,50 %	4, 0,12 %
+Novedades con el servicio	Mantenimiento	137, 4,75 %	93, 3,27 %	103, 3,06 %
+Novedades con el servicio	Reclamos	184, 6,38 %	229, 8,05 %	271, 8,04 %
+Novedades con el servicio	Clientes Silenciosos	260, 9,01 %	268, 9,42 %	335, 9,94 %
+Otras Bajas	Otras Bajas	54, 1,87 %	48, 1,69 %	70, 2,08 %
+Otras Bajas	Corto Tiempo de Vida	85, 2,95 %	97, 3,41 %	99, 2,94 %
+Problemas Económicos	Problemas Económicos	379, 13,14 %	384, 13,50 %	397, 11,78 %
+Traslado fuera de cobertura	Traslado Fuera de Cobertura	301, 10,43 %	303, 10,65 %	355, 10,54 %
+Viaje	Viaje	629, 21,80 %	641, 22,54 %	732, 21,73 %
+Lectura principal de los datos
+
+Entre las clasificaciones visibles, Viaje es el motivo con mayor participación durante los tres meses: 21,80 % en agosto, 22,54 % en septiembre y 21,73 % en octubre. El volumen aumenta de 629 a 732 casos entre agosto y octubre, aunque el peso porcentual permanece relativamente estable.
+
+Problemas Económicos ocupa otra participación relevante, con 379, 384 y 397 casos. Su porcentaje baja de 13,14 % en agosto a 11,78 % en octubre, lo que indica que la cantidad aumenta, pero el total mensual de bajas crece a un ritmo mayor.
+
+Traslado Fuera de Cobertura también presenta crecimiento, de 301 casos en agosto a 355 en octubre, manteniendo una participación estable alrededor del 10,5 %. Clientes Silenciosos aumenta de 260 a 335 casos y alcanza 9,94 % en octubre.
+
+Las variaciones más llamativas son:
+
+MAC pasa de 37 casos y 1,28 % en agosto a 308 casos y 9,14 % en octubre.
+Niveles de Potencia cae de 106 casos y 3,67 % en agosto a solamente 4 casos y 0,12 % en octubre.
+Reclamos crece de 184 casos en agosto a 271 en octubre.
+Renuncia Forzosa se mantiene relativamente estable en volumen, con 80, 78 y 77 casos, pero pierde participación porcentual.
+
+El aumento de MAC y la caída de Niveles de Potencia podrían representar un cambio operativo en la clasificación de los casos, una modificación de reglas, una migración de categorías o una diferencia de carga de información en octubre. La pantalla por sí sola no permite confirmar la causa.
+
+Filtros visibles
+
+A la izquierda, en el estante de filtros, se observan campos relacionados con:
+
+FAMILIA.
+REGION_LIBERADO (grupo).
+CATEGORIA_NSE (grupo).
+MA(Fecha).
+DESCRIPCION_FORMA_PAGO.
+Tiempo de Vida.
+ID_IDENTIFICACION (grupo).
+Informe Gerencial.
+MES(Fecha).
+Otros filtros parcialmente ocultos por el desplazamiento.
+
+A la derecha aparecen controles interactivos:
+
+MES(Fecha): enero a octubre de 2026 están seleccionados; noviembre está desmarcado. La opción “Todo” no está seleccionada.
+MA(Fecha): aparece como lista desplegable con la indicación “Valores…”.
+Segmento: está seleccionado únicamente Masivo; Corporativo está desmarcado.
+Familia: está seleccionado únicamente Internet; Telefonía, Televisión y TV DTH están desmarcados.
+
+Por tanto, la lectura específica de la captura es: motivos de bajas voluntarias del segmento Masivo, familia Internet, para los meses de enero a octubre de 2026, además de las condiciones establecidas por los demás filtros de la hoja.
+
+Configuración de marcas y medidas
+
+La tarjeta Marcas utiliza el tipo Automático, con los valores colocados en Texto, por lo que el resultado es una tabla numérica y no un gráfico. En Valores de medidas aparecen:
+
+AGG(BAJAS VOLUNTARIAS (copia)).
+Cálculo11, acompañado por el símbolo triangular que identifica un cálculo de tabla.
+
+No existen campos visibles asignados a color, tamaño, detalle o descripción emergente. La diferenciación visual se consigue principalmente mediante encabezados azules, bordes horizontales y agrupación jerárquica.
+
+Elementos técnicos visibles
+
+En el panel de datos está seleccionada una fuente denominada “Consulta SQL personaliz…”, lo que indica que la hoja trabaja con una consulta SQL personalizada. También aparecen otras fuentes o conexiones llamadas Clipboard_20261001 T1....
+
+En la barra inferior, Tableau informa:
+
+90 marcas.
+15 filas por 6 columnas.
+SUMA de Valores de medidas: 9.101.
+
+Las 6 columnas corresponden a los tres meses visibles multiplicados por las dos medidas mostradas en cada mes. Las 90 marcas son consistentes con 15 filas por 6 posiciones de medida.
+
+Descripción consolidada para otra IA
+
+La pantalla es una hoja de Tableau destinada a analizar los motivos de bajas voluntarias de clientes masivos de Internet fijo. La tabla organiza las bajas por una categoría general llamada Informe Gerencial2 y un submotivo llamado Clasificacion IG. Para cada mes presenta el número de bajas y el porcentaje que cada motivo representa dentro del total mensual. La captura muestra agosto, septiembre y octubre de 2026, aunque el filtro mantiene seleccionados los meses de enero a octubre. Los principales motivos visibles son Viaje, Problemas Económicos, Traslado Fuera de Cobertura, Clientes Silenciosos, SDA, Reclamos, Mala Venta, Cambio de Proveedor y Renuncia Forzosa. Viaje concentra aproximadamente el 22 % mensual. En octubre destaca un aumento excepcional de MAC a 308 casos y una reducción de Niveles de Potencia a 4 casos, lo que requiere validar posibles cambios en la clasificación o carga de datos.
