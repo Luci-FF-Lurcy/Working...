@@ -133,3 +133,88 @@ Las 6 columnas corresponden a los tres meses visibles multiplicados por las dos 
 Descripción consolidada para otra IA
 
 La pantalla es una hoja de Tableau destinada a analizar los motivos de bajas voluntarias de clientes masivos de Internet fijo. La tabla organiza las bajas por una categoría general llamada Informe Gerencial2 y un submotivo llamado Clasificacion IG. Para cada mes presenta el número de bajas y el porcentaje que cada motivo representa dentro del total mensual. La captura muestra agosto, septiembre y octubre de 2026, aunque el filtro mantiene seleccionados los meses de enero a octubre. Los principales motivos visibles son Viaje, Problemas Económicos, Traslado Fuera de Cobertura, Clientes Silenciosos, SDA, Reclamos, Mala Venta, Cambio de Proveedor y Renuncia Forzosa. Viaje concentra aproximadamente el 22 % mensual. En octubre destaca un aumento excepcional de MAC a 308 casos y una reducción de Niveles de Potencia a 4 casos, lo que requiere validar posibles cambios en la clasificación o carga de datos.
+
+
+
+
+
+
+Descripción de “INFORME GERENCIAL DETALLE % ”
+
+ % y Cálculo11 junto con Tabla (abajo) desglosado por Fecha mes vs. Informe Gerencial2 y Clasificacion IG. Los datos se filtran en FAMILIA, REGION_LIBERADO (grupo), CATEGORIA_NSE (grupo), Fecha (MA), DESCRIPCION_FORMA_PAGO (grupo), Tiempo de Vida, ID_IDENTIFICACION (grupo), Informe Gerencial, TECNOLOGIA y CIUDAD_LIBERADO. El filtro FAMILIA conserva Internet. El filtro REGION_LIBERADO (grupo) conserva R1, R2 y SIN ESPECIFICAR. El filtro CATEGORIA_NSE (grupo) conserva A, B, C+, C- y D. El filtro Fecha (MA) conserva agosto de 2026, septiembre de 2026 y octubre de 2026. El filtro DESCRIPCION_FORMA_PAGO (grupo) conserva BANCO EN TRAMITE, Banco y CFA. El filtro Tiempo de Vida conserva 9 de 9 miembros. El filtro ID_IDENTIFICACION (grupo) conserva Masivo. El filtro Informe Gerencial excluye NULL. El filtro TECNOLOGIA conserva DTH, GPON y HFC. El filtro CIUDAD_LIBERADO conserva 50 de 50 miembros. La vista se filtra en Fecha mes, lo que excluye noviembre de 2026. Los porcentajes se basan en cada columna de la tabla.
+
+Marcas
+
+El tipo de marca es Texto (Automático).
+Marcas apiladas está activado.
+Estantes
+
+Filas:	Informe Gerencial2, Clasificacion IG
+Columnas:	Mes de Fecha, Nombres de medidas
+Filtros:	FAMILIA, REGION_LIBERADO (grupo), CATEGORIA_NSE (grupo), Mes, Año de Fecha, DESCRIPCION_FORMA_PAGO (grupo), Tiempo de Vida, ID_IDENTIFICACION (grupo), Informe Gerencial, Mes de Fecha, Nombres de medidas, TECNOLOGIA, CIUDAD_LIBERADO
+Texto:	Valores de medidas
+Dimensiones
+
+Nombres de medidas tiene 2 miembros en esta hoja
+Miembros:  %; Cálculo11 junto con Tabla (abajo)
+CATEGORIA_NSE (grupo) tiene 5 miembros en esta hoja
+Miembros: A; B; C+; C-; D
+DESCRIPCION_FORMA_PAGO (grupo) tiene 3 miembros en esta hoja
+Miembros: BANCO EN TRAMITE; Banco; CFA
+ID_IDENTIFICACION (grupo) tiene 1 miembros en esta hoja
+Miembros: Masivo
+REGION_LIBERADO (grupo) tiene 3 miembros en esta hoja
+Miembros: R1; R2; SIN ESPECIFICAR
+Informe Gerencial tiene 9 miembros en esta hoja
+Miembros: Asociado a altas; Cambio de proveedor; Fallas con el servicio; Mala Venta; Otras Bajas; ...
+Fecha (MA) tiene 3 miembros en esta hoja
+Miembros: agosto de 2026; octubre de 2026; septiembre de 2026
+La fórmula es 
+DATE(DATE(LEFT([FECHA_PROCESO], 4) + '-' + MID([FECHA_PROCESO], 5, 2) + '-01'))
+CIUDAD_LIBERADO tiene 50 miembros en esta hoja
+Miembros: AMBATO; ATUNTAQUI; AZOGUES; BABAHOYO; NULL; ...
+Informe Gerencial2 tiene 8 miembros en esta hoja
+Miembros: Baja en linea; Cambio de proveedor; Mala Venta; Novedades con el servicio; Otras Bajas; ...
+La fórmula es 
+IF  [Informe Gerencial] = 'Fallas con el servicio' THEN 'Novedades con el servicio' 
+ELSEIF  [Informe Gerencial] = 'Asociado a altas' THEN 'Otras Bajas' 
+ELSEIF [Informe Gerencial] = 'Renuncia Forzosa' THEN 'Baja en linea' ELSE [Informe Gerencial] END
+Tiempo de Vida tiene 9 miembros en esta hoja
+Miembros: 0-3; 13-18; 19-24; 25-36; 37-48; ...
+La fórmula es 
+IF [Tiempo_Vida] >= 0 AND [Tiempo_Vida] <= 3.99 THEN "0-3"
+ELSEIF [Tiempo_Vida] >= 4 AND [Tiempo_Vida] <= 6.99 THEN "4-6"
+ELSEIF [Tiempo_Vida] >= 7 AND [Tiempo_Vida] <= 12.99 THEN "7-12"
+ELSEIF [Tiempo_Vida] >= 13 AND [Tiempo_Vida] <= 18.99 THEN "13-18"
+ELSEIF [Tiempo_Vida] >= 19 AND [Tiempo_Vida] <= 24.99 THEN "19-24"
+ELSEIF [Tiempo_Vida] >= 25 AND [Tiempo_Vida] <= 36 THEN "25-36"
+ELSEIF [Tiempo_Vida] >= 36.01 AND [Tiempo_Vida] <= 48.99 THEN "37-48"
+ELSEIF [Tiempo_Vida] >= 49 AND [Tiempo_Vida] <= 60.99 THEN "49-60"
+ELSE ">60"
+END
+FAMILIA tiene 1 miembros en esta hoja
+Miembros: Internet
+Clasificacion IG tiene 14 miembros en esta hoja
+Miembros: Cambio de Proveedor; MAC; Otras Malas Ventas; Renuncia Forzosa; SDA; ...
+Organizado en orden ascendiente por BAJAS VOLUNTARIAS en todos los valores de Clasificacion IG.
+TECNOLOGIA tiene 3 miembros en esta hoja
+Miembros: DTH; GPON; HFC
+Fecha mes tiene 3 miembros en esta hoja
+Miembros: agosto de 2026; octubre de 2026; septiembre de 2026
+La fórmula es 
+DATE(DATE(LEFT([FECHA_PROCESO], 4) + '-' + MID([FECHA_PROCESO], 5, 2) + '-01'))
+Medidas
+
+Valores de medidas va de 0 a 3.369 en esta hoja.
+Detalles de fuente de datos
+
+Fuente de datos:	Consulta SQL personalizada (OID_DB)
+Tipo:	Hyper
+Versión:	2
+Base de datos:	C:/Users/aledesmm/AppData/Local/Temp/TableauTemp/1lqa5pz1pgh0t419ucb7m1969vej/Data/Extracts/federated_142uius04rau9517jyoav1.hyper
+Tabla:	Extract (Extract.Extract)
+1 tabla lógica:
+Consulta SQL personalizada
+
+
+
