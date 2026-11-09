@@ -1,220 +1,281 @@
-La captura corresponde a una hoja de trabajo de Tableau Desktop del libro “INFORME GERENCIAL”. La hoja activa se denomina aproximadamente “INFORME GERENCIAL DETALLE…” y presenta una tabla cruzada titulada “Motivos Bajas Voluntaria”, orientada a analizar mensualmente el volumen y la participación porcentual de los motivos asociados a bajas voluntarias de servicios fijos.
+WITH BAJAS_BASE AS
+(
+    SELECT
+        A.SUBSCRIBER_ID,
+        A.IDENTIFICACION,
+        A.ID_IDENTIFICACION,
+        A.ID_IDENTIFICACION_GRUPO,
 
-Objetivo de la visualización
+        DATE(A.FECHA_BAJA) AS FECHA_BAJA,
+        DATE(A.FECHA_ALTA) AS FECHA_ALTA,
+        A.FECHA_PROCESO,
 
-La tabla permite comparar cómo se distribuyen las bajas voluntarias por motivo gerencial y clasificación específica, mostrando para cada mes dos medidas:
+        TO_DATE(
+            SUBSTR(CAST(A.FECHA_PROCESO AS VARCHAR(8)),1,6) || '01',
+            'YYYYMMDD'
+        ) AS FECHA_MES,
 
-Cantidad de bajas voluntarias, representada por AGG(BAJAS VOLUNTARIAS (copia)).
-Participación porcentual del motivo dentro del total mensual, representada por Cálculo11, configurado como cálculo de tabla.
+        A.FAMILIA,
+        A.TECNOLOGIA,
+        A.TIPO_BAJA,
 
-Por ejemplo, para octubre de 2026 se observan 732 casos de Viaje, equivalentes al 21,73 % del total mensual. Esto significa que cada porcentaje debe interpretarse verticalmente dentro de su respectivo mes, no como variación respecto al mes anterior.
+        A.INFORME_GERENCIAL,
+        A.SUBCLASIFICACION_INFORME_GERENCIAL,
+        A.SUBCLASIFICACION_TIPO_BAJA,
+        A.CLASIFICAR_TIPO_BAJA,
+        A.TIPOLOGIA,
+        A.USUARIO_FINAL,
 
-Estructura de la tabla
+        A.TIEMPO_VIDA,
+        A.DESCRIPCION_FORMA_PAGO,
 
-En el estante de Columnas aparecen:
+        A.SEGMENTO_CLIENTE,
+        A.CANAL_FINAL,
+        A.CANAL_F,
+        A.CANAL_VENTA_EJECUTIVO,
 
-MES(Fecha): organiza la información cronológicamente.
-Nombres de medidas: genera dos columnas por cada mes, una para el volumen y otra para el porcentaje.
+        A.PROVINCIA,
+        A.NODO_FINAL,
 
-En el estante de Filas aparecen:
+        A.TOTAL_SERVICIOS,
+        A.TIPO_PAQUETE,
+        A.TARIFA_BASICA,
+        A.VALOR_RECURRENTE,
 
-Informe Gerencial2: agrupación general del motivo de baja.
-Clasificacion IG: detalle o submotivo asociado a cada agrupación general.
+        A.TIP_MOTIVO_ATENCION,
+        A.TIPO_MOTIVO_ATENCION,
+        A.GRUPO_ORIGEN,
+        A.ORIGEN,
 
-La tabla visible muestra tres meses: agosto de 2026, septiembre de 2026 y octubre de 2026. Existe una barra de desplazamiento vertical dentro de la vista, por lo que pueden existir más filas o categorías fuera del área visible. El filtro mensual indica que enero a octubre de 2026 están seleccionados y noviembre está desmarcado, por lo que la visualización completa contiene más meses de los que caben simultáneamente en pantalla.
+        A.BASE,
+        A.ABONADOS_REALES,
+        A.COINCIDENCIA_ALTA_BAJA,
 
-Jerarquía de motivos mostrada
+        A.CATEGORIZACION_TIER_2,
+        A.CATEGORIZACION_TIER_3,
+        A.PRODUCTO,
+        A.codigo_sucursal,
+        A.tipo_transaccion,
+        A.OFFERING_INST_ID
 
-La primera columna agrupa los motivos de manera gerencial y la segunda los desglosa en clasificaciones específicas:
+    FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG A
 
-Baja en línea
-Renuncia Forzosa.
-Cambio de proveedor
-Cambio de Proveedor.
-Mala Venta
-MAC.
-Otras Malas Ventas.
-SDA.
-Novedades con el servicio
-Niveles de Potencia.
-Mantenimiento.
-Reclamos.
-Clientes Silenciosos.
-Otras Bajas
-Otras Bajas.
-Corto Tiempo de Vida.
-Problemas Económicos
-Problemas Económicos.
-Traslado fuera de cobertura
-Traslado Fuera de Cobertura.
-Viaje
-Viaje.
+    WHERE A.FECHA_PROCESO >= '20260801'
+      AND A.FECHA_PROCESO <  '20261101'
 
-Las líneas horizontales azules separan visualmente cada agrupación principal de Informe Gerencial2.
+      AND A.FAMILIA = 'Internet'
+      AND A.INFORME_GERENCIAL IS NOT NULL
 
-Valores visibles
-Motivo general	Clasificación	Ago-26	Sept-26	Oct-26
-Baja en línea	Renuncia Forzosa	80, 2,77 %	78, 2,74 %	77, 2,29 %
-Cambio de proveedor	Cambio de Proveedor	193, 6,69 %	153, 5,38 %	164, 4,87 %
-Mala Venta	MAC	37, 1,28 %	40, 1,41 %	308, 9,14 %
-Mala Venta	Otras Malas Ventas	176, 6,10 %	180, 6,33 %	148, 4,39 %
-Mala Venta	SDA	264, 9,15 %	259, 9,11 %	306, 9,08 %
-Novedades con el servicio	Niveles de Potencia	106, 3,67 %	71, 2,50 %	4, 0,12 %
-Novedades con el servicio	Mantenimiento	137, 4,75 %	93, 3,27 %	103, 3,06 %
-Novedades con el servicio	Reclamos	184, 6,38 %	229, 8,05 %	271, 8,04 %
-Novedades con el servicio	Clientes Silenciosos	260, 9,01 %	268, 9,42 %	335, 9,94 %
-Otras Bajas	Otras Bajas	54, 1,87 %	48, 1,69 %	70, 2,08 %
-Otras Bajas	Corto Tiempo de Vida	85, 2,95 %	97, 3,41 %	99, 2,94 %
-Problemas Económicos	Problemas Económicos	379, 13,14 %	384, 13,50 %	397, 11,78 %
-Traslado fuera de cobertura	Traslado Fuera de Cobertura	301, 10,43 %	303, 10,65 %	355, 10,54 %
-Viaje	Viaje	629, 21,80 %	641, 22,54 %	732, 21,73 %
-Lectura principal de los datos
+      AND A.TECNOLOGIA IN ('DTH','GPON','HFC')
 
-Entre las clasificaciones visibles, Viaje es el motivo con mayor participación durante los tres meses: 21,80 % en agosto, 22,54 % en septiembre y 21,73 % en octubre. El volumen aumenta de 629 a 732 casos entre agosto y octubre, aunque el peso porcentual permanece relativamente estable.
+      AND UPPER(TRIM(A.ID_IDENTIFICACION_GRUPO)) = 'MASIVO'
 
-Problemas Económicos ocupa otra participación relevante, con 379, 384 y 397 casos. Su porcentaje baja de 13,14 % en agosto a 11,78 % en octubre, lo que indica que la cantidad aumenta, pero el total mensual de bajas crece a un ritmo mayor.
+      AND UPPER(TRIM(A.DESCRIPCION_FORMA_PAGO))
+          IN ('BANCO EN TRAMITE','BANCO','CFA')
+),
 
-Traslado Fuera de Cobertura también presenta crecimiento, de 301 casos en agosto a 355 en octubre, manteniendo una participación estable alrededor del 10,5 %. Clientes Silenciosos aumenta de 260 a 335 casos y alcanza 9,94 % en octubre.
+GPON_MAP AS
+(
+    SELECT
+        CASE
+            WHEN REGION = 'R1' THEN 'REGION 1'
+            WHEN REGION = 'R2' THEN 'REGION 2'
+        END AS REGION_L,
 
-Las variaciones más llamativas son:
+        OLT,
+        CLUSTE,
+        CIUDAD,
+        DISPONIBILIDAD_HP_TOTAL,
 
-MAC pasa de 37 casos y 1,28 % en agosto a 308 casos y 9,14 % en octubre.
-Niveles de Potencia cae de 106 casos y 3,67 % en agosto a solamente 4 casos y 0,12 % en octubre.
-Reclamos crece de 184 casos en agosto a 271 en octubre.
-Renuncia Forzosa se mantiene relativamente estable en volumen, con 80, 78 y 77 casos, pero pierde participación porcentual.
+        ROW_NUMBER() OVER (
+            PARTITION BY CLUSTE
+            ORDER BY FECHA_PROCESO DESC
+        ) AS RN
 
-El aumento de MAC y la caída de Niveles de Potencia podrían representar un cambio operativo en la clasificación de los casos, una modificación de reglas, una migración de categorías o una diferencia de carga de información en octubre. La pantalla por sí sola no permite confirmar la causa.
+    FROM OID_DB.MAPEO.TIC_HPS_LIBERADAS_GPON
 
-Filtros visibles
+    WHERE FECHA_PROCESO =
+    (
+        SELECT MAX(FECHA_PROCESO)
+        FROM OID_DB.MAPEO.TIC_HPS_LIBERADAS_GPON
+    )
+),
 
-A la izquierda, en el estante de filtros, se observan campos relacionados con:
+HFC_MAP AS
+(
+    SELECT
+        REGION_HUB AS REGION,
+        PARROQUIA_HUB,
+        NODO,
+        GF_BF,
+        CIUDAD_HUB,
+        DISPONIBILIDAD_HP_TOTAL,
 
-FAMILIA.
-REGION_LIBERADO (grupo).
-CATEGORIA_NSE (grupo).
-MA(Fecha).
-DESCRIPCION_FORMA_PAGO.
-Tiempo de Vida.
-ID_IDENTIFICACION (grupo).
-Informe Gerencial.
-MES(Fecha).
-Otros filtros parcialmente ocultos por el desplazamiento.
+        ROW_NUMBER() OVER (
+            PARTITION BY NODO
+            ORDER BY FECHA_PROCESO DESC
+        ) AS RN
 
-A la derecha aparecen controles interactivos:
+    FROM OID_DB.MAPEO.TIC_HPS_LIBERADAS_HFC
 
-MES(Fecha): enero a octubre de 2026 están seleccionados; noviembre está desmarcado. La opción “Todo” no está seleccionada.
-MA(Fecha): aparece como lista desplegable con la indicación “Valores…”.
-Segmento: está seleccionado únicamente Masivo; Corporativo está desmarcado.
-Familia: está seleccionado únicamente Internet; Telefonía, Televisión y TV DTH están desmarcados.
+    WHERE FECHA_PROCESO =
+    (
+        SELECT MAX(FECHA_PROCESO)
+        FROM OID_DB.MAPEO.TIC_HPS_LIBERADAS_HFC
+    )
+),
 
-Por tanto, la lectura específica de la captura es: motivos de bajas voluntarias del segmento Masivo, familia Internet, para los meses de enero a octubre de 2026, además de las condiciones establecidas por los demás filtros de la hoja.
+NSE_MAP AS
+(
+    SELECT
+        CASE
+            WHEN ID_NSE = '1' THEN 'Muy Alto'
+            WHEN ID_NSE = '2' THEN 'Alto'
+            WHEN ID_NSE = '3' THEN 'Medio Tipico'
+            WHEN ID_NSE = '4' THEN 'Medio Bajo'
+            WHEN ID_NSE = '5' THEN 'Bajo'
+            ELSE CAST(ID_NSE AS VARCHAR(20))
+        END AS CATEGORIA_NSE,
 
-Configuración de marcas y medidas
+        ID_RED
 
-La tarjeta Marcas utiliza el tipo Automático, con los valores colocados en Texto, por lo que el resultado es una tabla numérica y no un gráfico. En Valores de medidas aparecen:
+    FROM OID_DB.OID_DB.OID_RESUMEN_RED_FIJA
 
-AGG(BAJAS VOLUNTARIAS (copia)).
-Cálculo11, acompañado por el símbolo triangular que identifica un cálculo de tabla.
+    WHERE FECHA_PROCESO =
+    (
+        SELECT MAX(FECHA_PROCESO)
+        FROM OID_DB.OID_DB.OID_RESUMEN_RED_FIJA
+    )
+),
 
-No existen campos visibles asignados a color, tamaño, detalle o descripción emergente. La diferenciación visual se consigue principalmente mediante encabezados azules, bordes horizontales y agrupación jerárquica.
+BAJAS_ENRIQUECIDAS AS
+(
+    SELECT
+        B.*,
 
-Elementos técnicos visibles
+        CASE
+            WHEN B.TECNOLOGIA = 'GPON' THEN C.REGION_L
+            WHEN B.TECNOLOGIA = 'HFC' THEN D.REGION
+        END AS REGION_LIBERADO,
 
-En el panel de datos está seleccionada una fuente denominada “Consulta SQL personaliz…”, lo que indica que la hoja trabaja con una consulta SQL personalizada. También aparecen otras fuentes o conexiones llamadas Clipboard_20261001 T1....
+        CASE
+            WHEN B.TECNOLOGIA = 'GPON' THEN C.OLT
+            WHEN B.TECNOLOGIA = 'HFC' THEN D.PARROQUIA_HUB
+        END AS OLT_LIBERADO,
 
-En la barra inferior, Tableau informa:
+        CASE
+            WHEN B.TECNOLOGIA = 'GPON' THEN C.CLUSTE
+            WHEN B.TECNOLOGIA = 'HFC' THEN D.NODO
+        END AS CLUSTE_LIBERADO,
 
-90 marcas.
-15 filas por 6 columnas.
-SUMA de Valores de medidas: 9.101.
+        CASE
+            WHEN B.TECNOLOGIA = 'GPON' THEN UPPER(C.CIUDAD)
+            WHEN B.TECNOLOGIA = 'HFC' THEN UPPER(D.CIUDAD_HUB)
+        END AS CIUDAD_LIBERADO,
 
-Las 6 columnas corresponden a los tres meses visibles multiplicados por las dos medidas mostradas en cada mes. Las 90 marcas son consistentes con 15 filas por 6 posiciones de medida.
+        CASE
+            WHEN B.TECNOLOGIA = 'GPON'
+                THEN C.DISPONIBILIDAD_HP_TOTAL
+            WHEN B.TECNOLOGIA = 'HFC'
+                THEN D.DISPONIBILIDAD_HP_TOTAL
+        END AS TOTAL_HP,
 
-Descripción consolidada para otra IA
+        CAST(
+            CASE
+                WHEN B.TECNOLOGIA = 'GPON'
+                    THEN C.DISPONIBILIDAD_HP_TOTAL
+                WHEN B.TECNOLOGIA = 'HFC'
+                    THEN D.DISPONIBILIDAD_HP_TOTAL
+            END AS INT
+        ) AS HOME_PASS_F,
 
-La pantalla es una hoja de Tableau destinada a analizar los motivos de bajas voluntarias de clientes masivos de Internet fijo. La tabla organiza las bajas por una categoría general llamada Informe Gerencial2 y un submotivo llamado Clasificacion IG. Para cada mes presenta el número de bajas y el porcentaje que cada motivo representa dentro del total mensual. La captura muestra agosto, septiembre y octubre de 2026, aunque el filtro mantiene seleccionados los meses de enero a octubre. Los principales motivos visibles son Viaje, Problemas Económicos, Traslado Fuera de Cobertura, Clientes Silenciosos, SDA, Reclamos, Mala Venta, Cambio de Proveedor y Renuncia Forzosa. Viaje concentra aproximadamente el 22 % mensual. En octubre destaca un aumento excepcional de MAC a 308 casos y una reducción de Niveles de Potencia a 4 casos, lo que requiere validar posibles cambios en la clasificación o carga de datos.
+        D.GF_BF,
 
+        NS.CATEGORIA_NSE
 
+    FROM BAJAS_BASE B
 
+    LEFT JOIN GPON_MAP C
+        ON (
+            B.NODO_FINAL = C.CLUSTE
+            OR SUBSTR(B.NODO_FINAL,1,6) = C.CLUSTE
+            OR SUBSTR(B.NODO_FINAL,4,6) = C.CLUSTE
+            OR SUBSTR(B.NODO_FINAL,1,5) = C.CLUSTE
+        )
+        AND C.RN = 1
 
+    LEFT JOIN HFC_MAP D
+        ON (
+            B.NODO_FINAL = D.NODO
+            OR SUBSTR(B.NODO_FINAL,1,6) = D.NODO
+            OR SUBSTR(B.NODO_FINAL,4,6) = D.NODO
+            OR SUBSTR(B.NODO_FINAL,1,5) = D.NODO
+        )
+        AND D.RN = 1
 
+    LEFT JOIN NSE_MAP NS
+        ON B.NODO_FINAL = NS.ID_RED
+),
 
-Descripción de “INFORME GERENCIAL DETALLE % ”
+BAJAS_CLASIFICADAS AS
+(
+    SELECT
+        E.*,
 
- % y Cálculo11 junto con Tabla (abajo) desglosado por Fecha mes vs. Informe Gerencial2 y Clasificacion IG. Los datos se filtran en FAMILIA, REGION_LIBERADO (grupo), CATEGORIA_NSE (grupo), Fecha (MA), DESCRIPCION_FORMA_PAGO (grupo), Tiempo de Vida, ID_IDENTIFICACION (grupo), Informe Gerencial, TECNOLOGIA y CIUDAD_LIBERADO. El filtro FAMILIA conserva Internet. El filtro REGION_LIBERADO (grupo) conserva R1, R2 y SIN ESPECIFICAR. El filtro CATEGORIA_NSE (grupo) conserva A, B, C+, C- y D. El filtro Fecha (MA) conserva agosto de 2026, septiembre de 2026 y octubre de 2026. El filtro DESCRIPCION_FORMA_PAGO (grupo) conserva BANCO EN TRAMITE, Banco y CFA. El filtro Tiempo de Vida conserva 9 de 9 miembros. El filtro ID_IDENTIFICACION (grupo) conserva Masivo. El filtro Informe Gerencial excluye NULL. El filtro TECNOLOGIA conserva DTH, GPON y HFC. El filtro CIUDAD_LIBERADO conserva 50 de 50 miembros. La vista se filtra en Fecha mes, lo que excluye noviembre de 2026. Los porcentajes se basan en cada columna de la tabla.
+        CASE
+            WHEN UPPER(TRIM(E.REGION_LIBERADO))
+                 IN ('R1','REGION 1') THEN 'R1'
+            WHEN UPPER(TRIM(E.REGION_LIBERADO))
+                 IN ('R2','REGION 2') THEN 'R2'
+            ELSE 'SIN ESPECIFICAR'
+        END AS REGION_LIBERADO_GRUPO,
 
-Marcas
+        CASE
+            WHEN E.CATEGORIA_NSE = 'Muy Alto' THEN 'A'
+            WHEN E.CATEGORIA_NSE = 'Alto' THEN 'B'
+            WHEN E.CATEGORIA_NSE = 'Medio Tipico' THEN 'C+'
+            WHEN E.CATEGORIA_NSE = 'Medio Bajo' THEN 'C-'
+            WHEN E.CATEGORIA_NSE = 'Bajo' THEN 'D'
+        END AS CATEGORIA_NSE_GRUPO,
 
-El tipo de marca es Texto (Automático).
-Marcas apiladas está activado.
-Estantes
+        CASE
+            WHEN E.INFORME_GERENCIAL = 'Fallas con el servicio'
+                THEN 'Novedades con el servicio'
+            WHEN E.INFORME_GERENCIAL = 'Asociado a altas'
+                THEN 'Otras Bajas'
+            WHEN E.INFORME_GERENCIAL = 'Renuncia Forzosa'
+                THEN 'Baja en linea'
+            ELSE E.INFORME_GERENCIAL
+        END AS INFORME_GERENCIAL2,
 
-Filas:	Informe Gerencial2, Clasificacion IG
-Columnas:	Mes de Fecha, Nombres de medidas
-Filtros:	FAMILIA, REGION_LIBERADO (grupo), CATEGORIA_NSE (grupo), Mes, Año de Fecha, DESCRIPCION_FORMA_PAGO (grupo), Tiempo de Vida, ID_IDENTIFICACION (grupo), Informe Gerencial, Mes de Fecha, Nombres de medidas, TECNOLOGIA, CIUDAD_LIBERADO
-Texto:	Valores de medidas
-Dimensiones
+        CASE
+            WHEN E.TIEMPO_VIDA >= 0 AND E.TIEMPO_VIDA <= 3.99
+                THEN '0-3'
+            WHEN E.TIEMPO_VIDA >= 4 AND E.TIEMPO_VIDA <= 6.99
+                THEN '4-6'
+            WHEN E.TIEMPO_VIDA >= 7 AND E.TIEMPO_VIDA <= 12.99
+                THEN '7-12'
+            WHEN E.TIEMPO_VIDA >= 13 AND E.TIEMPO_VIDA <= 18.99
+                THEN '13-18'
+            WHEN E.TIEMPO_VIDA >= 19 AND E.TIEMPO_VIDA <= 24.99
+                THEN '19-24'
+            WHEN E.TIEMPO_VIDA >= 25 AND E.TIEMPO_VIDA <= 36
+                THEN '25-36'
+            WHEN E.TIEMPO_VIDA >= 36.01 AND E.TIEMPO_VIDA <= 48.99
+                THEN '37-48'
+            WHEN E.TIEMPO_VIDA >= 49 AND E.TIEMPO_VIDA <= 60.99
+                THEN '49-60'
+            ELSE '>60'
+        END AS TIEMPO_VIDA_GRUPO
 
-Nombres de medidas tiene 2 miembros en esta hoja
-Miembros:  %; Cálculo11 junto con Tabla (abajo)
-CATEGORIA_NSE (grupo) tiene 5 miembros en esta hoja
-Miembros: A; B; C+; C-; D
-DESCRIPCION_FORMA_PAGO (grupo) tiene 3 miembros en esta hoja
-Miembros: BANCO EN TRAMITE; Banco; CFA
-ID_IDENTIFICACION (grupo) tiene 1 miembros en esta hoja
-Miembros: Masivo
-REGION_LIBERADO (grupo) tiene 3 miembros en esta hoja
-Miembros: R1; R2; SIN ESPECIFICAR
-Informe Gerencial tiene 9 miembros en esta hoja
-Miembros: Asociado a altas; Cambio de proveedor; Fallas con el servicio; Mala Venta; Otras Bajas; ...
-Fecha (MA) tiene 3 miembros en esta hoja
-Miembros: agosto de 2026; octubre de 2026; septiembre de 2026
-La fórmula es 
-DATE(DATE(LEFT([FECHA_PROCESO], 4) + '-' + MID([FECHA_PROCESO], 5, 2) + '-01'))
-CIUDAD_LIBERADO tiene 50 miembros en esta hoja
-Miembros: AMBATO; ATUNTAQUI; AZOGUES; BABAHOYO; NULL; ...
-Informe Gerencial2 tiene 8 miembros en esta hoja
-Miembros: Baja en linea; Cambio de proveedor; Mala Venta; Novedades con el servicio; Otras Bajas; ...
-La fórmula es 
-IF  [Informe Gerencial] = 'Fallas con el servicio' THEN 'Novedades con el servicio' 
-ELSEIF  [Informe Gerencial] = 'Asociado a altas' THEN 'Otras Bajas' 
-ELSEIF [Informe Gerencial] = 'Renuncia Forzosa' THEN 'Baja en linea' ELSE [Informe Gerencial] END
-Tiempo de Vida tiene 9 miembros en esta hoja
-Miembros: 0-3; 13-18; 19-24; 25-36; 37-48; ...
-La fórmula es 
-IF [Tiempo_Vida] >= 0 AND [Tiempo_Vida] <= 3.99 THEN "0-3"
-ELSEIF [Tiempo_Vida] >= 4 AND [Tiempo_Vida] <= 6.99 THEN "4-6"
-ELSEIF [Tiempo_Vida] >= 7 AND [Tiempo_Vida] <= 12.99 THEN "7-12"
-ELSEIF [Tiempo_Vida] >= 13 AND [Tiempo_Vida] <= 18.99 THEN "13-18"
-ELSEIF [Tiempo_Vida] >= 19 AND [Tiempo_Vida] <= 24.99 THEN "19-24"
-ELSEIF [Tiempo_Vida] >= 25 AND [Tiempo_Vida] <= 36 THEN "25-36"
-ELSEIF [Tiempo_Vida] >= 36.01 AND [Tiempo_Vida] <= 48.99 THEN "37-48"
-ELSEIF [Tiempo_Vida] >= 49 AND [Tiempo_Vida] <= 60.99 THEN "49-60"
-ELSE ">60"
-END
-FAMILIA tiene 1 miembros en esta hoja
-Miembros: Internet
-Clasificacion IG tiene 14 miembros en esta hoja
-Miembros: Cambio de Proveedor; MAC; Otras Malas Ventas; Renuncia Forzosa; SDA; ...
-Organizado en orden ascendiente por BAJAS VOLUNTARIAS en todos los valores de Clasificacion IG.
-TECNOLOGIA tiene 3 miembros en esta hoja
-Miembros: DTH; GPON; HFC
-Fecha mes tiene 3 miembros en esta hoja
-Miembros: agosto de 2026; octubre de 2026; septiembre de 2026
-La fórmula es 
-DATE(DATE(LEFT([FECHA_PROCESO], 4) + '-' + MID([FECHA_PROCESO], 5, 2) + '-01'))
-Medidas
+    FROM BAJAS_ENRIQUECIDAS E
+)
 
-Valores de medidas va de 0 a 3.369 en esta hoja.
-Detalles de fuente de datos
+SELECT *
+FROM BAJAS_CLASIFICADAS
 
-Fuente de datos:	Consulta SQL personalizada (OID_DB)
-Tipo:	Hyper
-Versión:	2
-Base de datos:	C:/Users/aledesmm/AppData/Local/Temp/TableauTemp/1lqa5pz1pgh0t419ucb7m1969vej/Data/Extracts/federated_142uius04rau9517jyoav1.hyper
-Tabla:	Extract (Extract.Extract)
-1 tabla lógica:
-Consulta SQL personalizada
+WHERE REGION_LIBERADO_GRUPO
+      IN ('R1','R2','SIN ESPECIFICAR')
 
-
-
+  AND CATEGORIA_NSE_GRUPO
+      IN ('A','B','C+','C-','D');
