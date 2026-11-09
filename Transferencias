@@ -2,7 +2,11 @@
 WITH BAJAS_OCTUBRE AS (
     SELECT
         SUBSCRIBER_ID,
-        DATE(FECHA_BAJA) AS FECHA_BAJA
+        FECHA_BAJA,
+        DATE(FECHA_BAJA) AS FECHA_BAJA_DIA,
+        FAMILIA AS FAMILIA_BAJA,
+        SUBCLASIFICACION_INFORME_GERENCIAL AS MOTIVO_BAJA,
+        FECHA_PROCESO AS CORTE_BAJA
 
     FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
 
@@ -18,49 +22,54 @@ WITH BAJAS_OCTUBRE AS (
           'RC'
       )
       AND FECHA_PROCESO = '202610'
+      AND FECHA_BAJA >= DATE '2026-10-01'
+      AND FECHA_BAJA < DATE '2026-11-01'
 ),
 
 INTENCIONES AS (
-    /* UNION ALL VALIDADO */
+    SELECT
+        SUBSCRIBER_ID,
+        FECHA_INTENCION,
+        RESULTADO_INTENCION
+
+    FROM (
+        /* UNION ALL VALIDADO DE INBOUND,
+           KIOSKO E INSTANTCALL */
+    ) U
+
+    WHERE FECHA_INTENCION >= DATE '2026-09-01'
+      AND FECHA_INTENCION < DATE '2026-11-01'
 )
 
 SELECT
-    COUNT(*) AS TOTAL_BAJAS,
+    B.SUBSCRIBER_ID,
+    B.FECHA_BAJA_DIA,
+    B.FAMILIA_BAJA,
+    B.MOTIVO_BAJA,
+    B.CORTE_BAJA,
 
-    SUM(
-        CASE
-            WHEN B.FECHA_BAJA IS NOT NULL
-             AND EXISTS (
-                SELECT 1
-                FROM INTENCIONES I
-                WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
-                  AND I.FECHA_INTENCION < B.FECHA_BAJA
-             )
-            THEN 1
-            ELSE 0
-        END
-    ) AS BAJAS_CON_INTENCION,
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM INTENCIONES I
+            WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
+              AND I.FECHA_INTENCION < B.FECHA_BAJA
+        )
+        THEN 1
+        ELSE 0
+    END AS TIENE_INTENCION,
 
-    SUM(
-        CASE
-            WHEN B.FECHA_BAJA IS NOT NULL
-             AND NOT EXISTS (
-                SELECT 1
-                FROM INTENCIONES I
-                WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
-                  AND I.FECHA_INTENCION < B.FECHA_BAJA
-             )
-            THEN 1
-            ELSE 0
-        END
-    ) AS BAJAS_SIN_INTENCION,
-
-    SUM(
-        CASE
-            WHEN B.FECHA_BAJA IS NULL THEN 1
-            ELSE 0
-        END
-    ) AS BAJAS_SIN_FECHA
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM INTENCIONES I
+            WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
+              AND I.FECHA_INTENCION < B.FECHA_BAJA
+              AND I.RESULTADO_INTENCION = 'RETENIDO'
+        )
+        THEN 1
+        ELSE 0
+    END AS TIENE_RETENCION_PREVIA
 
 FROM BAJAS_OCTUBRE B
 ;
