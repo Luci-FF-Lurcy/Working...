@@ -81,6 +81,123 @@ PROCESO:
 
 
 
+/*###############################################################################################################################################################################
+################################################################                   QUERYS                   #####################################################################
+################################################################################################################################################################################# */
+
+/*###############################################################################################################################################################
+#####################################################            HOMOLOGACIÓN INTENCIONES            #####################################################################
+############################################################################################################################################################### */
+-- Intenciones Totales funnel:
+-- Inbound: 5439
+-- Kiosko 9258
+-- instantcall: 15
+
+
+SELECT --INTENCIONES.CANAL, COUNT(*)--
+'PRIMERA LINEA' AS LINEA, INTENCIONES.* 
+FROM(
+    SELECT
+    'INBOUND' AS CANAL,
+    CAST (FECHA_CREACION AS DATE) AS FECHA_INTENCION,
+    ID_ORDEN_TRABAJO,
+    ID_SERVICIO AS SUBSCRIBER_ID,
+    CATEGORIZACION_OPERACIONAL_N1,
+    CATEGORIZACION_OPERACIONAL_N3,
+    UBICACIONES_ATENCION,
+    CATEGORIA_RESOLUCION_NIVEL_2_F AS RESULTADO_GESTION,
+    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+    FECHA_IMPACTO,
+    CASE 
+        WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN ('RRSS','CONTACT CENTER') AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) NOT IN ('RECHAZADO') THEN 1
+        WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN ('RETENCIÓN Y RECUPERACIÓN') AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) IN ('NO RETENIDO', 'RETENIDO') THEN 1 -- EMILIO
+        END AS RNR
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
+    WHERE RNR = 1
+
+    UNION ALL 
+    SELECT 
+    'KIOSKO' AS CANAL,
+    FECHA_INGRESO AS FECHA_INTENCION,
+    ID_ORDEN_TRABAJO,
+    SUBSCRIBER_ID,
+    CATEGORIZACION_OPERACIONAL_N1,
+    CATEGORIZACION_OPERACIONAL_N3,
+    CAC AS UBICACIONES_ATENCION,
+    TIPOLOGIA_GESTION AS RESULTADO_GESTION,
+    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+    FECHA_IMPACTO,
+    NULL AS RNR
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+
+    UNION ALL
+    SELECT
+    'INSTANTCALL' AS CANAL,
+    CAST (FECHA_CREACION AS DATE) AS FECHA_INTENCION,
+    ID_ORDEN_TRABAJO,
+    ID_SERVICIO AS SUBSCRIBER_ID,
+    CATEGORIZACION_OPERACIONAL_N1,
+    CATEGORIZACION_OPERACIONAL_N3,
+    UBICACIONES_ATENCION,
+    CATEGORIA_RESOLUCION_NIVEL_2F AS RESULTADO_GESTION,
+    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+    FECHA_IMPACTO,
+    NULL AS RNR
+    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INSTANTCALL
+    WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO' -- Preguntar EMILIO
+) AS INTENCIONES
+
+WHERE INTENCIONES.FECHA_INTENCION >= '2026-10-01'
+AND INTENCIONES.FECHA_INTENCION < '2026-11-01'
+--GROUP BY INTENCIONES.CANAL
+LIMIT 1000
+;
+
+--################# CRUCE CON TABLERO INFORME GERENCIAL BAJAS
+SELECT *
+FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
+LIMIT 1000
+;
+
+
+--################ CRUCE CON TABLERO INVENTARIO
+
+
+
+
+/*###############################################################################################################################################################
+#####################################################            INFORME GERENCIAL            #####################################################################
+############################################################################################################################################################### */
+
+SELECT 
+FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL, COUNT(*)  
+FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
+WHERE GRUPO_ORIGEN = 'BAJAS'
+AND TIPO_BAJA = 'VOLUNTARIA'
+AND ID_IDENTIFICACION IN ('CARNE DE REFUGIADO','CED','CEDULA','CR','PAS','PASAPORTE','RC')
+AND FECHA_PROCESO = '202610'
+GROUP BY FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL
+;
+
+SELECT
+SUBSCRIBER_ID,
+FECHA_BAJA,
+FAMILIA,
+GRUPO_ORIGEN,
+TIPO_BAJA,
+SUBCLASIFICACION_INFORME_GERENCIAL,
+ID_IDENTIFICACION,
+    CASE
+        WHEN ID_IDENTIFICACION IN ('CARNE DE REFUGIADO','CED','CEDULA','CR','PAS','PASAPORTE','RC') THEN 'MASIVO'
+        ELSE ID_IDENTIFICACION
+        END AS SEGMENTO
+FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
+
+WHERE GRUPO_ORIGEN = 'BAJAS'
+    AND TIPO_BAJA = 'VOLUNTARIA'
+    AND FECHA_PROCESO = '202610'
+
+
 
 
 
