@@ -1,7 +1,7 @@
 
 /*######################################################################
-  CRUCE BAJAS OCTUBRE 2026 VS INTENCIONES SEPTIEMBRE 2026
-  OBJETIVO: IDENTIFICAR INTENCIONES PREVIAS A CADA BAJA
+  BAJAS OCTUBRE 2026 - ULTIMA INTENCION PREVIA
+  OBJETIVO: UNA FILA POR CADA REGISTRO DE BAJA
 ######################################################################*/
 
 WITH INTENCIONES_GLOBAL AS (
@@ -25,25 +25,21 @@ WITH INTENCIONES_GLOBAL AS (
             CATEGORIA_RESOLUCION_NIVEL_2_F AS RESULTADO_GESTION,
             CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
             FECHA_IMPACTO,
-
             CASE
                 WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF)
                      IN ('RRSS','CONTACT CENTER')
                  AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F)
-                     NOT IN ('RECHAZADO')
-                    THEN 1
+                     NOT IN ('RECHAZADO') THEN 1
 
                 WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF)
                      IN ('RETENCIÓN Y RECUPERACIÓN')
                  AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F)
-                     IN ('NO RETENIDO','RETENIDO')
-                    THEN 1
+                     IN ('NO RETENIDO','RETENIDO') THEN 1
             END AS RNR
 
         FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
 
         WHERE RNR = 1
-
 
         UNION ALL
 
@@ -51,7 +47,7 @@ WITH INTENCIONES_GLOBAL AS (
 
         SELECT
             'KIOSKO' AS CANAL,
-            CAST(FECHA_INGRESO AS DATE) AS FECHA_INTENCION,
+            FECHA_INGRESO AS FECHA_INTENCION,
             ID_ORDEN_TRABAJO,
             SUBSCRIBER_ID,
             CATEGORIZACION_OPERACIONAL_N1,
@@ -63,7 +59,6 @@ WITH INTENCIONES_GLOBAL AS (
             NULL AS RNR
 
         FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
-
 
         UNION ALL
 
@@ -88,21 +83,29 @@ WITH INTENCIONES_GLOBAL AS (
 
     ) AS INTENCIONES
 
-    /* INTENCIONES REGISTRADAS EN SEPTIEMBRE */
-
     WHERE INTENCIONES.FECHA_INTENCION >= DATE '2026-09-01'
       AND INTENCIONES.FECHA_INTENCION < DATE '2026-10-01'
 ),
 
 /*--------------------------------------------------------------------
-  BASE DE BAJAS - INFORME GERENCIAL
+  BASE DE BAJAS
+  SE CONSERVAN LOS FILTROS ORIGINALES DEL INFORME GERENCIAL
 --------------------------------------------------------------------*/
 
 BAJAS_OCTUBRE AS (
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY
+                SUBSCRIBER_ID,
+                FECHA_BAJA,
+                FAMILIA,
+                SUBCLASIFICACION_INFORME_GERENCIAL,
+                ID_IDENTIFICACION
+        ) AS ID_REGISTRO_BAJA,
+
         SUBSCRIBER_ID,
-        DATE(FECHA_BAJA) AS FECHA_BAJA,
+        FECHA_BAJA,
         FAMILIA,
         GRUPO_ORIGEN,
         TIPO_BAJA,
@@ -118,8 +121,7 @@ BAJAS_OCTUBRE AS (
                 'PAS',
                 'PASAPORTE',
                 'RC'
-            )
-            THEN 'MASIVO'
+            ) THEN 'MASIVO'
             ELSE ID_IDENTIFICACION
         END AS SEGMENTO
 
@@ -128,49 +130,115 @@ BAJAS_OCTUBRE AS (
     WHERE GRUPO_ORIGEN = 'BAJAS'
       AND TIPO_BAJA = 'VOLUNTARIA'
       AND FECHA_PROCESO = '202610'
+),
+
+/*--------------------------------------------------------------------
+  LEFT JOIN Y ORDENAMIENTO DE INTENCIONES
+--------------------------------------------------------------------*/
+
+CRUCE AS (
+
+    SELECT
+        B.ID_REGISTRO_BAJA,
+        B.SUBSCRIBER_ID,
+        B.FECHA_BAJA,
+        B.FAMILIA,
+        B.GRUPO_ORIGEN,
+        B.TIPO_BAJA,
+        B.SUBCLASIFICACION_INFORME_GERENCIAL,
+        B.ID_IDENTIFICACION,
+        B.SEGMENTO,
+
+        I.LINEA,
+        I.CANAL,
+        I.FECHA_INTENCION,
+        I.ID_ORDEN_TRABAJO,
+        I.CATEGORIZACION_OPERACIONAL_N1,
+        I.CATEGORIZACION_OPERACIONAL_N3,
+        I.UBICACIONES_ATENCION,
+        I.RESULTADO_GESTION,
+        I.HERRAMIENTA_RETENCION,
+        I.FECHA_IMPACTO,
+        I.RNR,
+
+        /* TOTAL DE INTENCIONES PREVIAS POR REGISTRO DE BAJA */
+
+        COUNT(I.SUBSCRIBER_ID) OVER (
+            PARTITION BY B.ID_REGISTRO_BAJA
+        ) AS TOTAL_INTENCIONES_PREVIAS,
+
+        /* ORDENAR DE LA INTENCION MAS RECIENTE A LA MAS ANTIGUA */
+
+        ROW_NUMBER() OVER (
+            PARTITION BY B.ID_REGISTRO_BAJA
+            ORDER BY
+                I.FECHA_INTENCION DESC,
+                I.ID_ORDEN_TRABAJO DESC
+        ) AS RN
+
+    FROM BAJAS_OCTUBRE B
+
+    LEFT JOIN INTENCIONES_GLOBAL I
+        ON B.SUBSCRIBER_ID = I.SUBSCRIBER_ID
+       AND I.FECHA_INTENCION < B.FECHA_BAJA
+),
+
+/*--------------------------------------------------------------------
+  CONSERVAR SOLAMENTE LA ULTIMA INTENCION DE CADA BAJA
+--------------------------------------------------------------------*/
+
+RESULTADO_FINAL AS (
+
+    SELECT
+        ID_REGISTRO_BAJA,
+        SUBSCRIBER_ID,
+        FECHA_BAJA,
+        FAMILIA,
+        GRUPO_ORIGEN,
+        TIPO_BAJA,
+        SUBCLASIFICACION_INFORME_GERENCIAL,
+        ID_IDENTIFICACION,
+        SEGMENTO,
+
+        LINEA,
+        CANAL,
+        FECHA_INTENCION,
+        ID_ORDEN_TRABAJO,
+        CATEGORIZACION_OPERACIONAL_N1,
+        CATEGORIZACION_OPERACIONAL_N3,
+        UBICACIONES_ATENCION,
+        RESULTADO_GESTION,
+        HERRAMIENTA_RETENCION,
+        FECHA_IMPACTO,
+        RNR,
+
+        TOTAL_INTENCIONES_PREVIAS,
+
+        CASE
+            WHEN TOTAL_INTENCIONES_PREVIAS > 0 THEN 1
+            ELSE 0
+        END AS TIENE_INTENCION
+
+    FROM CRUCE
+
+    WHERE RN = 1
 )
 
 /*--------------------------------------------------------------------
-  CRUCE FINAL - LEFT JOIN CLASICO
+  RESULTADO Y RESUMEN DE COBERTURA
 --------------------------------------------------------------------*/
 
 SELECT
+    R.*,
 
-    /* DATOS DE LA BAJA */
+    COUNT(*) OVER () AS TOTAL_BAJAS,
 
-    B.SUBSCRIBER_ID,
-    B.FECHA_BAJA,
-    B.FAMILIA,
-    B.GRUPO_ORIGEN,
-    B.TIPO_BAJA,
-    B.SUBCLASIFICACION_INFORME_GERENCIAL,
-    B.ID_IDENTIFICACION,
-    B.SEGMENTO,
+    SUM(TIENE_INTENCION) OVER ()
+        AS BAJAS_CON_INTENCION,
 
-    /* DATOS DE LA INTENCION */
+    SUM(
+        CASE WHEN TIENE_INTENCION = 0 THEN 1 ELSE 0 END
+    ) OVER () AS BAJAS_SIN_INTENCION
 
-    I.LINEA,
-    I.CANAL,
-    I.FECHA_INTENCION,
-    I.ID_ORDEN_TRABAJO,
-    I.CATEGORIZACION_OPERACIONAL_N1,
-    I.CATEGORIZACION_OPERACIONAL_N3,
-    I.UBICACIONES_ATENCION,
-    I.RESULTADO_GESTION,
-    I.HERRAMIENTA_RETENCION,
-    I.FECHA_IMPACTO,
-    I.RNR,
-
-    /* INDICADOR DE EXISTENCIA DE INTENCION */
-
-    CASE
-        WHEN I.SUBSCRIBER_ID IS NOT NULL THEN 1
-        ELSE 0
-    END AS TIENE_INTENCION
-
-FROM BAJAS_OCTUBRE B
-
-LEFT JOIN INTENCIONES_GLOBAL I
-    ON B.SUBSCRIBER_ID = I.SUBSCRIBER_ID
-   AND I.FECHA_INTENCION < B.FECHA_BAJA
+FROM RESULTADO_FINAL R
 ;
