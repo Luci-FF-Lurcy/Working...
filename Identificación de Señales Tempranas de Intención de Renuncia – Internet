@@ -1,213 +1,179 @@
 
+/*######################################################################
+   VALIDACION DE INTENCIONES PREVIAS A BAJAS DE OCTUBRE 2026
+######################################################################*/
 
+WITH INTENCIONES AS (
 
-Pendientes:
- - Entender NFILAF, RNR y NFILAFF, sin aplicar automáticamente los mismos filtros a todos los canales.
- - Cómo se vería la base final de analisis? Existen diferencias entre la base descriptiva y predictiva
- - Qué significa cerrar una incidencia sin resolver completamente el problema?
- - Tengo muchas intenciones de renuncia que finalmente no terminaron en renuncia, pero cuál es la intención de renuncia final? como identificarla. cuándo no logra se retenida?
- - Averiguar qué tan fiel son las tablas de intenciones sandbox a la realidad.
-
-APUNTES:
- - Dividir el analisis de los clientes que presentan más de una intención en Retenidos y no retenidos en la última retención
- - Agregar un filtro al Dashboard por números de reincidencia en la Intención para analizar qué tipo de gestión tuvo el cliente que es reincidente
- - 
-
-
-PROCESO:
-1)	Unir los canales en una sola base UNION ALL
-2) Definir:
-  - Incidencia
-  - Reincidencia
-  - Primera intención.
-#) Cruzar con Inventario
-#) Identificar qué bases serán las utilizadas además de las identificadas
-#) 
-
-
-1)
- 1.1) INBOUND columnas a utilizar:
-      - CANAL: INBOUND
-      - FECHA_CREACION: formato TIME
-      - ID_ORDEN_TRABAJO:
-      - ID_SERVICIO = SUBSCRIBER_ID
-      - CATEGORIZACION_OPERACIONAL_N1
-      - CATEGORIZACION_OPERACIONAL_N3
-      - CICLO_FINAL (Aun por ver si es igual en inventario)
-      - UBICACIONES_ATENCION
-      - CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
-      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
-      - FECHA_IMPACTO
-
- 1.2) KIOSKO columnas a utilizar:
-      - CANAL: KIOSKO
-      - FECHA_INGRESO: Formato DATE
-      - ID_ORDEN_TRABAJO:
-      - SUBSCRIBER_ID
-      - CATEGORIZACION_OPERACIONAL_N1
-      - CATEGORIZACION_OPERACIONAL_N3
-      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
-      - CAC = UBICACIONES_ATENCION
-      - TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
-      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
-      - FECHA_IMPACTO: fecha de impacto de la baja
-
-1.3) INSTANTCALL columnas a utilizar:
-      - CANAL: No existe en este canal
-      - FECHA_CREACION = FECHA_INGRESO: Formato TIME
-      - ID_ORDEN_TRABAJO:
-      - ID_SERVICIO = SUBSCRIBER_ID
-      - CATEGORIZACION_OPERACIONAL_N1
-      - CATEGORIZACION_OPERACIONAL_N3
-      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
-      - UBICACIONES_ATENCION = CAC
-      - CATEGORIA_RESOLUCION_NIVEL_2F = TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
-      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
-      - FECHA_IMPACTO: fecha de impacto de la baja
-
-1.3) BARRA columnas a utilizar NO UTILIZAR PORQUE FECHA DESACTUALIZADA:
-      - CANAL: No existe en este canal
-      - FECHA = FECHA_CREACION = FECHA_INGRESO: Formato TIME
-      - ID_ORDEN_TRABAJO: no existe para este canal
-      - ID_SERVICIO = SUBSCRIBER_ID
-      - CATEGORIZACION_OPERACIONAL_N1
-      - CATEGORIZACION_OPERACIONAL_N3
-      - CICLO_HOMOLOGADO_FINAL_F (Aun por ver si es igual en inventario)
-      - UBICACIONES_ATENCION = CAC
-      - CATEGORIA_RESOLUCION_NIVEL_2F = TIPOLOGIA_GESTION = CATEGORIA_RESOLUCION_NIVEL_2_F: RETENIDO, NO RETENIDO, NO CONTACTADO...
-      - CATEGORIA_RESOLUCION_NIVEL_3: Herramienta de retención (si la hubo)
-      - FECHA_IMPACTO: fecha de impacto de la baja
-
-
-
-
-/*###############################################################################################################################################################################
-################################################################                   QUERYS                   #####################################################################
-################################################################################################################################################################################# */
-
-/*###############################################################################################################################################################
-#####################################################            HOMOLOGACIÓN INTENCIONES            #####################################################################
-############################################################################################################################################################### */
--- Intenciones Totales funnel:
--- Inbound: 5439
--- Kiosko 9258
--- instantcall: 15
-
-
-SELECT --INTENCIONES.CANAL, COUNT(*)--
-'PRIMERA LINEA' AS LINEA, INTENCIONES.* 
-FROM(
     SELECT
-    'INBOUND' AS CANAL,
-    CAST (FECHA_CREACION AS DATE) AS FECHA_INTENCION,
-    ID_ORDEN_TRABAJO,
-    ID_SERVICIO AS SUBSCRIBER_ID,
-    CATEGORIZACION_OPERACIONAL_N1,
-    CATEGORIZACION_OPERACIONAL_N3,
-    UBICACIONES_ATENCION,
-    CATEGORIA_RESOLUCION_NIVEL_2_F AS RESULTADO_GESTION,
-    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
-    FECHA_IMPACTO,
-    CASE 
-        WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN ('RRSS','CONTACT CENTER') AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) NOT IN ('RECHAZADO') THEN 1
-        WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF) IN ('RETENCIÓN Y RECUPERACIÓN') AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F) IN ('NO RETENIDO', 'RETENIDO') THEN 1 -- EMILIO
-        END AS RNR
-    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
-    WHERE RNR = 1
+        'PRIMERA LINEA' AS LINEA,
+        U.*
 
-    UNION ALL 
-    SELECT 
-    'KIOSKO' AS CANAL,
-    FECHA_INGRESO AS FECHA_INTENCION,
-    ID_ORDEN_TRABAJO,
-    SUBSCRIBER_ID,
-    CATEGORIZACION_OPERACIONAL_N1,
-    CATEGORIZACION_OPERACIONAL_N3,
-    CAC AS UBICACIONES_ATENCION,
-    TIPOLOGIA_GESTION AS RESULTADO_GESTION,
-    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
-    FECHA_IMPACTO,
-    NULL AS RNR
-    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+    FROM (
 
-    UNION ALL
+        /*-------------------- INBOUND --------------------*/
+
+        SELECT
+            'INBOUND' AS CANAL,
+            CAST(FECHA_CREACION AS DATE) AS FECHA_INTENCION,
+            ID_ORDEN_TRABAJO,
+            ID_SERVICIO AS SUBSCRIBER_ID,
+            CATEGORIZACION_OPERACIONAL_N1,
+            CATEGORIZACION_OPERACIONAL_N3,
+            UBICACIONES_ATENCION,
+            CATEGORIA_RESOLUCION_NIVEL_2_F AS RESULTADO_GESTION,
+            CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+            FECHA_IMPACTO,
+
+            CASE
+                WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF)
+                     IN ('RRSS','CONTACT CENTER')
+                 AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F)
+                     NOT IN ('RECHAZADO')
+                    THEN 1
+
+                WHEN UPPER(GRUPO_SOPORTE_ASIGNADOF)
+                     IN ('RETENCIÓN Y RECUPERACIÓN')
+                 AND UPPER(CATEGORIA_RESOLUCION_NIVEL_2_F)
+                     IN ('NO RETENIDO', 'RETENIDO')
+                    THEN 1
+            END AS RNR
+
+        FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INBOUND
+
+        WHERE RNR = 1
+
+
+        UNION ALL
+
+        /*-------------------- KIOSKO --------------------*/
+
+        SELECT
+            'KIOSKO' AS CANAL,
+            CAST(FECHA_INGRESO AS DATE) AS FECHA_INTENCION,
+            ID_ORDEN_TRABAJO,
+            SUBSCRIBER_ID,
+            CATEGORIZACION_OPERACIONAL_N1,
+            CATEGORIZACION_OPERACIONAL_N3,
+            CAC AS UBICACIONES_ATENCION,
+            TIPOLOGIA_GESTION AS RESULTADO_GESTION,
+            CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+            FECHA_IMPACTO,
+            NULL AS RNR
+
+        FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_KIOSKO
+
+
+        UNION ALL
+
+        /*-------------------- INSTANTCALL --------------------*/
+
+        SELECT
+            'INSTANTCALL' AS CANAL,
+            CAST(FECHA_CREACION AS DATE) AS FECHA_INTENCION,
+            ID_ORDEN_TRABAJO,
+            ID_SERVICIO AS SUBSCRIBER_ID,
+            CATEGORIZACION_OPERACIONAL_N1,
+            CATEGORIZACION_OPERACIONAL_N3,
+            UBICACIONES_ATENCION,
+            CATEGORIA_RESOLUCION_NIVEL_2F AS RESULTADO_GESTION,
+            CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
+            FECHA_IMPACTO,
+            NULL AS RNR
+
+        FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INSTANTCALL
+
+        WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO'
+
+    ) U
+
+    /* INTENCIONES REGISTRADAS EN SEPTIEMBRE */
+
+    WHERE U.FECHA_INTENCION >= DATE '2026-09-01'
+      AND U.FECHA_INTENCION < DATE '2026-10-01'
+),
+
+/*--------------------------------------------------------------------
+  BAJAS VOLUNTARIAS DE OCTUBRE
+--------------------------------------------------------------------*/
+
+BAJAS_OCTUBRE AS (
+
     SELECT
-    'INSTANTCALL' AS CANAL,
-    CAST (FECHA_CREACION AS DATE) AS FECHA_INTENCION,
-    ID_ORDEN_TRABAJO,
-    ID_SERVICIO AS SUBSCRIBER_ID,
-    CATEGORIZACION_OPERACIONAL_N1,
-    CATEGORIZACION_OPERACIONAL_N3,
-    UBICACIONES_ATENCION,
-    CATEGORIA_RESOLUCION_NIVEL_2F AS RESULTADO_GESTION,
-    CATEGORIA_RESOLUCION_NIVEL_3 AS HERRAMIENTA_RETENCION,
-    FECHA_IMPACTO,
-    NULL AS RNR
-    FROM SANDBOX.SAC_RET.FIJO_INTENCIONES_INSTANTCALL
-    WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO' -- Preguntar EMILIO
-) AS INTENCIONES
+        SUBSCRIBER_ID,
+        DATE(FECHA_BAJA) AS FECHA_BAJA,
+        FAMILIA AS FAMILIA_BAJA,
+        SUBCLASIFICACION_INFORME_GERENCIAL AS MOTIVO_BAJA,
+        FECHA_PROCESO AS CORTE_BAJA
 
-WHERE INTENCIONES.FECHA_INTENCION >= '2026-10-01'
-AND INTENCIONES.FECHA_INTENCION < '2026-11-01'
---GROUP BY INTENCIONES.CANAL
-LIMIT 1000
-;
+    FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
 
---################# CRUCE CON TABLERO INFORME GERENCIAL BAJAS
-SELECT *
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
-LIMIT 1000
-;
+    WHERE GRUPO_ORIGEN = 'BAJAS'
+      AND TIPO_BAJA = 'VOLUNTARIA'
 
+      AND ID_IDENTIFICACION IN (
+          'CARNE DE REFUGIADO',
+          'CED',
+          'CEDULA',
+          'CR',
+          'PAS',
+          'PASAPORTE',
+          'RC'
+      )
 
---################ CRUCE CON TABLERO INVENTARIO
+      AND FECHA_PROCESO = '202610'
 
+      /* FECHA EFECTIVA DE BAJA EN OCTUBRE */
 
+      AND FECHA_BAJA >= DATE '2026-10-01'
+      AND FECHA_BAJA < DATE '2026-11-01'
+)
 
-
-/*###############################################################################################################################################################
-#####################################################            INFORME GERENCIAL            #####################################################################
-############################################################################################################################################################### */
-
-SELECT 
-FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL, COUNT(*)  
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
-WHERE GRUPO_ORIGEN = 'BAJAS'
-AND TIPO_BAJA = 'VOLUNTARIA'
-AND ID_IDENTIFICACION IN ('CARNE DE REFUGIADO','CED','CEDULA','CR','PAS','PASAPORTE','RC')
-AND FECHA_PROCESO = '202610'
-GROUP BY FECHA_PROCESO, FAMILIA, SUBCLASIFICACION_INFORME_GERENCIAL
-;
+/*--------------------------------------------------------------------
+  CRUCE Y VALIDACION
+--------------------------------------------------------------------*/
 
 SELECT
-SUBSCRIBER_ID,
-FECHA_BAJA,
-FAMILIA,
-GRUPO_ORIGEN,
-TIPO_BAJA,
-SUBCLASIFICACION_INFORME_GERENCIAL,
-ID_IDENTIFICACION,
+    B.SUBSCRIBER_ID,
+    B.FECHA_BAJA,
+    B.FAMILIA_BAJA,
+    B.MOTIVO_BAJA,
+    B.CORTE_BAJA,
+
+    /* EXISTENCIA DE AL MENOS UNA INTENCION PREVIA */
+
     CASE
-        WHEN ID_IDENTIFICACION IN ('CARNE DE REFUGIADO','CED','CEDULA','CR','PAS','PASAPORTE','RC') THEN 'MASIVO'
-        ELSE ID_IDENTIFICACION
-        END AS SEGMENTO
-FROM SANDBOX.SAC_RET.FIJO_FINAL_ABONADOS_BAJAS_IG
+        WHEN B.FECHA_BAJA IS NULL THEN NULL
 
-WHERE GRUPO_ORIGEN = 'BAJAS'
-    AND TIPO_BAJA = 'VOLUNTARIA'
-    AND FECHA_PROCESO = '202610'
+        WHEN EXISTS (
+            SELECT 1
+            FROM INTENCIONES I
 
+            WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
+              AND I.FECHA_INTENCION < B.FECHA_BAJA
+        )
+        THEN 1
 
+        ELSE 0
+    END AS TIENE_INTENCION,
 
+    /* EXISTENCIA DE AL MENOS UNA INTENCION RETENIDA */
 
+    CASE
+        WHEN B.FECHA_BAJA IS NULL THEN NULL
 
+        WHEN EXISTS (
+            SELECT 1
+            FROM INTENCIONES I
 
+            WHERE I.SUBSCRIBER_ID = B.SUBSCRIBER_ID
+              AND I.FECHA_INTENCION < B.FECHA_BAJA
+              AND UPPER(TRIM(I.RESULTADO_GESTION)) = 'RETENIDO'
+        )
+        THEN 1
 
+        ELSE 0
+    END AS TIENE_RETENCION_PREVIA
 
-
-
-
-
-
-
-
+FROM BAJAS_OCTUBRE B
+;
