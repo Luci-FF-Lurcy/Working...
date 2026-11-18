@@ -89,14 +89,14 @@ PROCESO:
 /*###############################################################################################################################################################
 #####################################################            HOMOLOGACIÓN INTENCIONES            #####################################################################
 ############################################################################################################################################################### */
--- Intenciones Totales funnel:
+-- Intenciones Totales Octubre funnel:
 -- Inbound: 5439
 -- Kiosko 9258
 -- instantcall: 15
 
-
 SELECT --INTENCIONES.CANAL, COUNT(*)--
-'PRIMERA LINEA' AS LINEA, INTENCIONES.* 
+'PRIMERA LINEA' AS LINEA, 
+INTENCIONES.*
 FROM(
     SELECT
     'INBOUND' AS CANAL,
@@ -148,9 +148,9 @@ FROM(
     WHERE CATEGORIA_RESOLUCION_NIVEL_2F <> 'RECHAZADO' -- Preguntar EMILIO
 ) AS INTENCIONES
 
-WHERE INTENCIONES.FECHA_INTENCION >= '2026-10-01'
+WHERE INTENCIONES.FECHA_INTENCION >= '2026-01-01'
 AND INTENCIONES.FECHA_INTENCION < '2026-11-01'
-;
+
 
 
 /*###############################################################################################################################################################
